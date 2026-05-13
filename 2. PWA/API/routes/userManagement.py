@@ -54,14 +54,3 @@ def loginUser(email, password):
         return user_result[0]
 
 
-def insertLog(
-    user_id, developer, start_time, end_time, time_worked, descriptions, status
-):
-    con = sql.connect(db_path)
-    cur = con.cursor()
-    cur.execute(
-        "INSERT INTO logs (user_id, developer, start_time, end_time, time_worked, descriptions, status) VALUES (?,?,?,?,?,?,?)",
-        (user_id, developer, start_time, end_time, time_worked, descriptions, status),
-    )
-    con.commit()
-    con.close()
