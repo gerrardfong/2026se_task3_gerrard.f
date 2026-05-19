@@ -1,4 +1,5 @@
 import sqlite3
+import random
 
 db_path = "../databases/rarities/characters.db"
 
@@ -13,19 +14,11 @@ RARITY_WEIGHTS = {
 }
 
 def rarity_generation():
-    # Normalise weights to percentages
-    total = sum(RARITY_WEIGHTS.values())
-    rarity_pct = {rarity: round(weight / total * 100) for rarity, weight in RARITY_WEIGHTS.items()}
-
-    # Attach percentages to each level from the DB
-    conn = sqlite3.connect(db_path)
-    rows = conn.execute("SELECT level, rarity FROM rarities").fetchall()
-
-    for level, rarity in rows:
-        pct = rarity_pct.get(rarity, 0)
-        print(f"{level} [{rarity}] — {pct}%")
-
-    conn.close()
+    return random.choices(
+        population=list(RARITY_WEIGHTS.keys()),
+        weights=list(RARITY_WEIGHTS.values()),
+        k=1
+    )[0]
 
 # Layer 1 — Validate/sanitise raw input at the boundary
 def parse_character_request(data: dict) -> dict:
@@ -44,4 +37,3 @@ def insert_character(user_id: int, character: dict) -> int:
         "INSERT INTO characters (user_id, name, rarity) VALUES (?, ?, ?)",
         (user_id, character['name'], character['rarity'])
     )
-    ...
