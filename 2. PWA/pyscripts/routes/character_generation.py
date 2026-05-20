@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3 as sql
 import random
 
 db_path = "../databases/rarities/characters.db"
@@ -20,20 +20,27 @@ def rarity_generation():
         k=1
     )[0]
 
-# Layer 1 — Validate/sanitise raw input at the boundary
-def parse_character_request(data: dict) -> dict:
-    # Validate types, reject unexpected keys, enforce constraints
-    ...
+def roll_attribute(attribute, character_id):
+    level = rarity_generation()
+    conn = sql.connect(db_path)
+    conn.execute("INSERT INTO character_attributes (character_id, attribute, level) VALUES (?,?,?)", (character_id, attribute, level,))
+    conn.commit()
+    conn.close()
+    return level
 
-# Layer 2 — Business logic (pure, no DB calls)
-def generate_character_attributes(species: str, rarity: str) -> dict:
-    # Weighted rolls, stat calculations
-    ...
+def roll_species():
+    rarity = rarity_generation()
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    conn.execute("SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1", (rarity))
+    user_id = cur.fetchone()
+    conn.close()
+    return user_id[0]
 
-# Layer 3 — DB insertion (parameterised queries only)
-def insert_character(user_id: int, character: dict) -> int:
-    conn = sqlite3.connect(db_path)
+def insert_character(user_id, character):
+    conn = sql.connect(db_path)
     conn.execute(
         "INSERT INTO characters (user_id, name, rarity) VALUES (?, ?, ?)",
         (user_id, character['name'], character['rarity'])
     )
+
