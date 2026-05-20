@@ -65,10 +65,11 @@ def view_characters() -> list:
     conn.close()
     return characters
 
-def view_attributes(character_id) -> list:
+def view_attributes(character_id: int) -> list:
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("SELECT attribute, level FROM characters_attribute WHERE character_id = ?", (character_id,))
+    cur.execute("SELECT attribute, level FROM character_attributes WHERE character_id = ?", (character_id,))
     column = [col[0] for col in cur.description]
     attributes = [dict(zip(column, row)) for row in cur.fetchall()]
+    conn.close()
     return attributes
