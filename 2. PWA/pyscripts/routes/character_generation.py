@@ -69,4 +69,7 @@ def view_attributes(character_id) -> list:
     user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("SELECT "
+    cur.execute("SELECT id, attribute FROM character_attributes WHERE character_id = ?", (character_id,))
+    attributes = [for row in cur.fetchall()]
+    conn.close()
+    return attributes
