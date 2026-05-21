@@ -1,0 +1,35 @@
+{
+    "name": "2026SE Task 3 - Flask PWA",
+    "image": "mcr.microsoft.com/devcontainers/python:3.12",
+    "postCreateCommand": "pip install -r requirements.txt",
+    "forwardPorts": [5000, 8888],
+    "portsAttributes": {
+        "5000": {
+            "label": "Flask App",
+            "onAutoForward": "notify"
+        },
+        "8888": {
+            "label": "JupyterLab",
+            "onAutoForward": "notify"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.pylint",
+                "ms-toolsai.jupyter",
+                "mtxr.sqltools",
+                "mtxr.sqltools-driver-sqlite",
+                "ms-python.black-formatter"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "editor.formatOnSave": true,
+                "[python]": {
+                    "editor.defaultFormatter": "ms-python.black-formatter"
+                }
+            }
+        }
+    }
+}
