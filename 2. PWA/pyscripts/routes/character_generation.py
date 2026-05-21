@@ -1,6 +1,6 @@
 import sqlite3 as sql
 import random
-from flask import session
+from flask import session, jsonify
 
 db_path = "../databases/rarities/characters.db"
 
@@ -73,3 +73,5 @@ def view_attributes(character_id: int) -> list:
     attributes = [dict(zip(column, row)) for row in cur.fetchall()]
     conn.close()
     return attributes
+
+@app.route("/generate")
