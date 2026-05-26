@@ -2,7 +2,7 @@ import sqlite3 as sql
 import random
 from flask import session, jsonify
 
-db_path = "../databases/rarities/characters.db"
+db_path = "../databases/characters/characters.db"
 
 RARITY_WEIGHTS = {
     'Common':    40,
