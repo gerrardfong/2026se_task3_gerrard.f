@@ -2,7 +2,41 @@
 
 {% block content %}
 <div class="container my-5">
-  <h1 class="display-4 fw-bold">Character Creation</h1>
-  <p class="text-muted">This page is under construction.</p>
+  <h1 class="display-4 fw-bold">Characters</h1>
+</div>
+<div class="container mb-5">
+  <div class="row g-4">
+
+    <!-- Left box: scrollable character list from DB -->
+    <div class="col-12 col-md-6">
+      <div class="border border-2 rounded-4 p-4 bg-white overflow-auto" style="max-height: 400px;">
+        <h2 class="h5 mb-3">Your Characters</h2>
+        <ul class="list-group">
+          {% if characters %}
+            {% for character in characters %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ character.name }}</strong>
+                  <span class="text-muted ms-2">{{ character.species }}</span>
+                </div>
+                <span class="badge bg-secondary">{{ character.attribute }}: {{ character.level }}</span>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li class="list-group-item text-muted">No characters yet. Create one!</li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right box: character creation form placeholder -->
+    <div class="col-12 col-md-6">
+      <div class="border border-2 rounded-4 p-4 bg-white">
+        <h2 class="h5 mb-3">Create a Character</h2>
+        <p class="text-muted">Character creation coming soon.</p>
+      </div>
+    </div>
+
+  </div>
 </div>
 {% endblock %}
