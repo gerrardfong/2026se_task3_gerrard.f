@@ -1,6 +1,6 @@
 import sqlite3 as sql
 import random
-from flask import session, jsonify
+from flask import session
 
 db_path = "../databases/characters/characters.db"
 
@@ -86,17 +86,38 @@ def view_characters() -> list:
     conn = sql.connect(db_path)
     cur = conn.cursor()
     cur.execute(
-        """SELECT c.id, c.name, s.species, ca.attribute, ca.level
+        """SELECT c.id, c.name, s.species, ca.attribute, ca.level, r.rarity
                 FROM characters c 
                 JOIN species s ON s.id = c.species_id 
                 LEFT JOIN character_attributes ca ON ca.character_id = c.id
+                LEFT JOIN rarities r ON r.level = ca.level
                 WHERE c.user_id=?""",
         (user_id,),
     )
-    columns = [col[0] for col in cur.description]
-    characters = [dict(zip(columns, row)) for row in cur.fetchall()]
+    rows = cur.fetchall()
     conn.close()
-    return characters
+
+    grouped = {}
+    for row in rows:
+        character_id, name, species, attribute, level, rarity = row
+        if character_id not in grouped:
+            grouped[character_id] = {
+                "id": character_id,
+                "name": name,
+                "species": species,
+                "profile_image": "",
+                "attributes": [],
+            }
+        if attribute is not None:
+            grouped[character_id]["attributes"].append(
+                {
+                    "attribute": attribute,
+                    "level": level,
+                    "rarity": rarity,
+                }
+            )
+
+    return list(grouped.values())
 
 
 def view_attributes(character_id: int) -> list:

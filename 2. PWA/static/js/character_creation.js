@@ -4,10 +4,205 @@ document.addEventListener("DOMContentLoaded", function () {
   const modalElement = document.getElementById("rollResultModal");
   const modalSpecies = document.getElementById("modal-species");
   const modalAttributes = document.getElementById("modal-attributes");
+  const pfpInput = document.getElementById("char-pfp");
+  const pfpPreview = document.getElementById("char-pfp-preview");
+  const pfpPlaceholder = document.getElementById("char-pfp-placeholder");
+  const pfpHiddenData = document.getElementById("char-pfp-data");
+  const pfpModalElement = document.getElementById("pfpCropModal");
+  const pfpCropStage = document.getElementById("pfp-crop-stage");
+  const pfpCropImage = document.getElementById("pfp-crop-image");
+  const pfpCropConfirm = document.getElementById("pfp-crop-confirm");
+  const pfpZoom = document.getElementById("pfp-zoom");
   if (!rollBtn) return;
 
   let rolledAttributes = {};
+  let finalPfpDataUrl = "";
   const rollModal = modalElement ? new bootstrap.Modal(modalElement) : null;
+  const pfpModal = pfpModalElement ? new bootstrap.Modal(pfpModalElement) : null;
+
+  const cropState = {
+    img: null,
+    x: 0,
+    y: 0,
+    scale: 1,
+    minScale: 1,
+    dragging: false,
+    dragOffsetX: 0,
+    dragOffsetY: 0,
+  };
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function getCircleBounds() {
+    if (!pfpCropStage) return { x: 0, y: 0, size: 0 };
+    const stageSize = pfpCropStage.clientWidth;
+    const size = stageSize * 0.72;
+    const offset = stageSize * 0.14;
+    return { x: offset, y: offset, size: size };
+  }
+
+  function constrainCropPosition() {
+    if (!cropState.img || !pfpCropStage) return;
+    const circle = getCircleBounds();
+    const scaledW = cropState.img.width * cropState.scale;
+    const scaledH = cropState.img.height * cropState.scale;
+
+    const minX = circle.x + circle.size - scaledW;
+    const maxX = circle.x;
+    const minY = circle.y + circle.size - scaledH;
+    const maxY = circle.y;
+
+    cropState.x = clamp(cropState.x, minX, maxX);
+    cropState.y = clamp(cropState.y, minY, maxY);
+  }
+
+  function renderCropImage() {
+    if (!cropState.img || !pfpCropImage) return;
+    pfpCropImage.style.width = cropState.img.width + "px";
+    pfpCropImage.style.height = cropState.img.height + "px";
+    pfpCropImage.style.transform =
+      "translate(" + cropState.x + "px, " + cropState.y + "px) scale(" + cropState.scale + ")";
+  }
+
+  function openCropModalFromFile(file) {
+    if (!file || !file.type || !file.type.startsWith("image/")) {
+      alert("Please choose an image file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        if (!pfpCropStage || !pfpCropImage) return;
+
+        cropState.img = img;
+        const stageSize = pfpCropStage.clientWidth || 320;
+        const circle = getCircleBounds();
+        const requiredScale = Math.max(circle.size / img.width, circle.size / img.height);
+
+        cropState.minScale = requiredScale;
+        cropState.scale = requiredScale;
+        if (pfpZoom) {
+          pfpZoom.min = String(requiredScale);
+          pfpZoom.value = String(requiredScale);
+        }
+
+        cropState.x = (stageSize - img.width * cropState.scale) / 2;
+        cropState.y = (stageSize - img.height * cropState.scale) / 2;
+        constrainCropPosition();
+        pfpCropImage.src = e.target.result;
+        renderCropImage();
+        if (pfpModal) pfpModal.show();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function onPasteImage(event) {
+    const items = event.clipboardData && event.clipboardData.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type && item.type.startsWith("image/")) {
+        const file = item.getAsFile();
+        if (file) {
+          event.preventDefault();
+          openCropModalFromFile(file);
+          return;
+        }
+      }
+    }
+  }
+
+  function setPreviewImage(dataUrl) {
+    finalPfpDataUrl = dataUrl;
+    if (pfpPreview) {
+      pfpPreview.src = dataUrl;
+      pfpPreview.style.display = "block";
+    }
+    if (pfpPlaceholder) pfpPlaceholder.style.display = "none";
+    if (pfpHiddenData) pfpHiddenData.value = dataUrl;
+  }
+
+  if (pfpInput) {
+    pfpInput.addEventListener("change", function () {
+      const file = pfpInput.files && pfpInput.files[0];
+      if (file) openCropModalFromFile(file);
+    });
+  }
+
+  document.addEventListener("paste", onPasteImage);
+
+  if (pfpCropStage) {
+    pfpCropStage.addEventListener("mousedown", function (event) {
+      if (!cropState.img) return;
+      cropState.dragging = true;
+      cropState.dragOffsetX = event.clientX - cropState.x;
+      cropState.dragOffsetY = event.clientY - cropState.y;
+      pfpCropStage.classList.add("dragging");
+    });
+
+    window.addEventListener("mousemove", function (event) {
+      if (!cropState.dragging) return;
+      cropState.x = event.clientX - cropState.dragOffsetX;
+      cropState.y = event.clientY - cropState.dragOffsetY;
+      constrainCropPosition();
+      renderCropImage();
+    });
+
+    window.addEventListener("mouseup", function () {
+      cropState.dragging = false;
+      pfpCropStage.classList.remove("dragging");
+    });
+  }
+
+  if (pfpZoom) {
+    pfpZoom.addEventListener("input", function () {
+      if (!cropState.img) return;
+      const nextScale = Math.max(parseFloat(pfpZoom.value), cropState.minScale);
+      const stageCenter = pfpCropStage.clientWidth / 2;
+      const imagePointX = (stageCenter - cropState.x) / cropState.scale;
+      const imagePointY = (stageCenter - cropState.y) / cropState.scale;
+
+      cropState.scale = nextScale;
+      cropState.x = stageCenter - imagePointX * cropState.scale;
+      cropState.y = stageCenter - imagePointY * cropState.scale;
+      constrainCropPosition();
+      renderCropImage();
+    });
+  }
+
+  if (pfpCropConfirm) {
+    pfpCropConfirm.addEventListener("click", function () {
+      if (!cropState.img || !pfpCropStage) return;
+
+      const circle = getCircleBounds();
+      const sourceX = (circle.x - cropState.x) / cropState.scale;
+      const sourceY = (circle.y - cropState.y) / cropState.scale;
+      const sourceSize = circle.size / cropState.scale;
+
+      const canvas = document.createElement("canvas");
+      const size = 256;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(cropState.img, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
+
+      const dataUrl = canvas.toDataURL("image/png");
+      setPreviewImage(dataUrl);
+      if (pfpModal) pfpModal.hide();
+    });
+  }
 
   function rarityClass(rarity) {
     return "rarity-" + String(rarity || "").replace(/\s+/g, "");
@@ -32,7 +227,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!rollModal || !modalSpecies || !modalAttributes) return;
     modalSpecies.textContent = species || "-";
     modalAttributes.innerHTML = "";
-    for (const [attr, rollData] of Object.entries(attributes || {})) {
+    for (const [attr, rollData] of Object.entries(attributes || {}).reverse()) {
       const rarityCss = rarityClass(rollData.rarity);
       const li = document.createElement("li");
       li.className = "list-group-item d-flex justify-content-between align-items-center";
@@ -73,7 +268,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("char-species").value = data.species;
       document.getElementById("species-id").value = data.species_id;
 
-      for (const [attr, rollData] of Object.entries(data.attributes)) {
+      for (const [attr, rollData] of Object.entries(data.attributes).reverse()) {
         const el = document.getElementById("attr-" + attr);
         renderAttributeChip(el, rollData);
       }
@@ -112,6 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
           name: name,
           species_id: speciesId,
           attributes: rolledAttributes,
+          profile_image: finalPfpDataUrl,
         }),
       });
 
