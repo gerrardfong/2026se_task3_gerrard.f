@@ -1,3 +1,40 @@
 .menu-card {
   min-height: 300px;
 }
+
+.rarity-Common {
+  color: #7a7a7a;
+}
+
+.rarity-Uncommon {
+  color: #2e8b57;
+}
+
+.rarity-Rare {
+  color: #1e5bb8;
+}
+
+.rarity-Epic {
+  color: #6f42c1;
+}
+
+.rarity-Legendary {
+  color: #d97706;
+}
+
+.rarity-Mythic {
+  color: #b91c1c;
+}
+
+.rarity-Ultra {
+  color: #b8860b;
+}
+
+.roll-level {
+  font-weight: 700;
+}
+
+.roll-rarity {
+  font-size: 0.85rem;
+  margin-left: 0.35rem;
+}

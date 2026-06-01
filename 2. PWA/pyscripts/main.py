@@ -65,6 +65,24 @@ def character_creation():
     return render_template("character_creation.html", characters=characters)
 
 
+@app.route("/api/roll-preview")
+def api_roll_preview():
+    result = dbChar.preview_roll()
+    return jsonify(result)
+
+
+@app.route("/api/create-character", methods=["POST"])
+def api_create_character():
+    data = request.get_json(silent=True) or {}
+    name = data.get("name", "").strip()
+    species_id = data.get("species_id")
+    attributes = data.get("attributes", {})
+    if not name or not species_id or not attributes:
+        return jsonify({"error": "Missing required fields"}), 400
+    character_id = dbChar.insert_character(name, int(species_id), attributes)
+    return jsonify({"character_id": character_id}), 201
+
+
 @app.route("/gauntlet")
 def gauntlet():
     return render_template("gauntlet.html")

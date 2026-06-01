@@ -29,14 +29,92 @@
       </div>
     </div>
 
-    <!-- Right box: character creation form placeholder -->
+    <!-- Right box: character creation form -->
     <div class="col-12 col-md-6">
       <div class="border border-2 rounded-4 p-4 bg-white">
         <h2 class="h5 mb-3">Create a Character</h2>
-        <p class="text-muted">Character creation coming soon.</p>
+        <form id="character-creation-form" novalidate>
+          <input type="hidden" id="csrf-token" value="{{ csrf_token() }}">
+          <input type="hidden" id="species-id" value="">
+
+          <!-- Name -->
+          <div class="mb-3">
+            <label for="char-name" class="form-label fw-semibold">Name</label>
+            <input type="text" class="form-control" id="char-name" placeholder="Enter character name" required>
+          </div>
+
+          <!-- Profile Picture -->
+          <div class="mb-3">
+            <label for="char-pfp" class="form-label fw-semibold">Profile Picture</label>
+            <input type="file" class="form-control" id="char-pfp" accept="image/*">
+          </div>
+
+          <!-- Species (read-only, populated after roll) -->
+          <div class="mb-3">
+            <label for="char-species" class="form-label fw-semibold">Species</label>
+            <input type="text" class="form-control" id="char-species" readonly placeholder="Roll to discover">
+          </div>
+
+          <!-- Attributes -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Attributes</label>
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Strength <span id="attr-Strength" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Durability <span id="attr-Durability" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Stamina <span id="attr-Stamina" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Speed <span id="attr-Speed" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                IQ <span id="attr-IQ" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                BIQ <span id="attr-BIQ" class="badge bg-secondary">-</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Roll button -->
+          <button type="button" class="btn btn-secondary w-100 mb-2" id="roll-btn">
+            Roll Species &amp; Attributes
+          </button>
+
+          <!-- Finalise button -->
+          <button type="button" class="btn btn-dark w-100" id="finalise-btn" disabled>
+            Finalise Character
+          </button>
+        </form>
       </div>
     </div>
 
   </div>
 </div>
+
+<div class="modal fade" id="rollResultModal" tabindex="-1" aria-labelledby="rollResultModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rollResultModalLabel">Roll Result</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2"><strong>Species:</strong> <span id="modal-species">-</span></p>
+        <ul class="list-group" id="modal-attributes"></ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/character_creation.js"></script>
 {% endblock %}

@@ -5,73 +5,124 @@ from flask import session, jsonify
 db_path = "../databases/characters/characters.db"
 
 RARITY_WEIGHTS = {
-    'Common':    40,
-    'Uncommon':  25,
-    'Rare':      15,
-    'Epic':       9,
-    'Legendary':  5,
-    'Mythic':     4,
-    'Ultra':      2,
+    "Common": 60,
+    "Uncommon": 15,
+    "Rare": 10,
+    "Epic": 6,
+    "Legendary": 2.5,
+    "Mythic": 1,
+    "Ultra": 0.5,
 }
 
-def rarity_generation() -> str:
-    return random.choices(
+
+def rarity_generation() -> dict:
+    rarity = random.choices(
         population=list(RARITY_WEIGHTS.keys()),
         weights=list(RARITY_WEIGHTS.values()),
-        k=1
+        k=1,
     )[0]
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT level FROM rarities WHERE rarity=? ORDER BY RANDOM() LIMIT 1", (rarity,)
+    )
+    row = cur.fetchone()
+    conn.close()
+    return {"rarity": rarity, "level": row[0]}
+
 
 def roll_attribute(attribute, character_id) -> str:
-    level = rarity_generation()
+    roll = rarity_generation()
     conn = sql.connect(db_path)
-    conn.execute("INSERT INTO character_attributes (character_id, attribute, level) VALUES (?,?,?)", (character_id, attribute, level,))
+    conn.execute(
+        "INSERT INTO character_attributes (character_id, attribute, level) VALUES (?,?,?)",
+        (
+            character_id,
+            attribute,
+            roll["level"],
+        ),
+    )
     conn.commit()
     conn.close()
-    return level
+    return roll
+
 
 def roll_species() -> int:
     rarity = rarity_generation()
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1", (rarity,))
+    cur.execute(
+        "SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1", (rarity,)
+    )
     species = cur.fetchone()
     conn.close()
     return species[0]
 
-def insert_character(name, species_id) -> int:
+
+def insert_character(name, species_id, attributes: dict = None) -> int:
     user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
     cur.execute(
         "INSERT INTO characters (name, species_id, user_id) VALUES (?, ?, ?)",
-        (name, species_id, user_id)
+        (name, species_id, user_id),
     )
-    conn.commit()
     character_id = cur.lastrowid
+    if attributes:
+        cur.executemany(
+            "INSERT INTO character_attributes (character_id, attribute, level) VALUES (?,?,?)",
+            [
+                (character_id, attr, roll["level"] if isinstance(roll, dict) else roll)
+                for attr, roll in attributes.items()
+            ],
+        )
+    conn.commit()
     conn.close()
     return character_id
+
 
 def view_characters() -> list:
     user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("""SELECT c.id, c.name, s.species, ca.attribute, ca.level
+    cur.execute(
+        """SELECT c.id, c.name, s.species, ca.attribute, ca.level
                 FROM characters c 
                 JOIN species s ON s.id = c.species_id 
                 LEFT JOIN character_attributes ca ON ca.character_id = c.id
-                WHERE c.user_id=?""", (user_id,))
+                WHERE c.user_id=?""",
+        (user_id,),
+    )
     columns = [col[0] for col in cur.description]
     characters = [dict(zip(columns, row)) for row in cur.fetchall()]
     conn.close()
     return characters
 
+
 def view_attributes(character_id: int) -> list:
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("SELECT attribute, level FROM character_attributes WHERE character_id = ?", (character_id,))
+    cur.execute(
+        "SELECT attribute, level FROM character_attributes WHERE character_id = ?",
+        (character_id,),
+    )
     column = [col[0] for col in cur.description]
     attributes = [dict(zip(column, row)) for row in cur.fetchall()]
     conn.close()
     return attributes
 
-@app.route("/generate")
+
+ATTRIBUTES = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"]
+
+
+def preview_roll() -> dict:
+    """Roll a random species and all attributes without persisting to the DB."""
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute("SELECT id, species FROM species ORDER BY RANDOM() LIMIT 1")
+    row = cur.fetchone()
+    conn.close()
+    species_id = row[0]
+    species_name = row[1]
+    attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
+    return {"species_id": species_id, "species": species_name, "attributes": attributes}
