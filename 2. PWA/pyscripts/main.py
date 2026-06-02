@@ -55,8 +55,7 @@ def login():
         
 @app.route("/mainmenu.html")
 def mainmenu():
-    return render_template("mainmenu.html"
-    "")
+    return render_template("mainmenu.html")
 
 
 @app.route("/character-creation")
