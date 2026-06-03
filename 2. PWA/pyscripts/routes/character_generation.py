@@ -11,10 +11,12 @@ RARITY_WEIGHTS = {
     "Epic": 6,
     "Legendary": 2.5,
     "Mythic": 1,
-    "Ultra": 0.5,
+    "Ultra": 0.49,
+    "diddenbludden": 0.01,
 }
 
 ATTRIBUTES = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"]
+
 
 def rarity_generation() -> dict:
     rarity = random.choices(
@@ -53,11 +55,13 @@ def roll_species():
     conn = sql.connect(db_path)
     cur = conn.cursor()
     cur.execute(
-        "SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1", (rarity["rarity"],)
+        "SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1",
+        (rarity["rarity"],),
     )
     species = cur.fetchone()
     conn.close()
     return species[0]
+
 
 def insert_character(name, species_id, attributes: dict) -> int:
     user_id = session.get("user_id")
@@ -71,10 +75,7 @@ def insert_character(name, species_id, attributes: dict) -> int:
     if attributes:
         cur.executemany(
             "INSERT INTO character_attributes (character_id, attribute, level) VALUES (?,?,?)",
-            [
-                (character_id, attr, roll["level"])
-                for attr, roll in attributes.items()
-            ],
+            [(character_id, attr, roll["level"]) for attr, roll in attributes.items()],
         )
     conn.commit()
     conn.close()
@@ -107,7 +108,7 @@ def view_characters() -> list:
                 "species": species,
                 "profile_image": "",
                 "attributes": [],
-            } 
+            }
             grouped[character_id]["attributes"].append(
                 {
                     "attribute": attribute,
@@ -117,6 +118,7 @@ def view_characters() -> list:
             )
 
     return list(grouped.values())
+
 
 def preview_roll() -> dict:
     """Roll a random species and all attributes without persisting to the DB."""
@@ -128,8 +130,13 @@ def preview_roll() -> dict:
     species_id = row[0]
     species_name = row[1]
     attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
-    session["pending_roll"] = {"species_id": species_id, "species": species_name, "attributes": attributes}
+    session["pending_roll"] = {
+        "species_id": species_id,
+        "species": species_name,
+        "attributes": attributes,
+    }
     return session["pending_roll"]
+
 
 # REDUNDANT - stored in case of future usage
 # def view_attributes(character_id: int) -> list:
