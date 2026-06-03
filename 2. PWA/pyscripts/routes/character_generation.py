@@ -14,6 +14,7 @@ RARITY_WEIGHTS = {
     "Ultra": 0.5,
 }
 
+ATTRIBUTES = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"]
 
 def rarity_generation() -> dict:
     rarity = random.choices(
@@ -47,19 +48,18 @@ def roll_attribute(attribute, character_id) -> str:
     return roll
 
 
-def roll_species() -> int:
+def roll_species():
     rarity = rarity_generation()
     conn = sql.connect(db_path)
     cur = conn.cursor()
     cur.execute(
-        "SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1", (rarity,)
+        "SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1", (rarity["rarity"],)
     )
     species = cur.fetchone()
     conn.close()
     return species[0]
 
-
-def insert_character(name, species_id, attributes: dict = None) -> int:
+def insert_character(name, species_id, attributes: dict) -> int:
     user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
@@ -72,7 +72,7 @@ def insert_character(name, species_id, attributes: dict = None) -> int:
         cur.executemany(
             "INSERT INTO character_attributes (character_id, attribute, level) VALUES (?,?,?)",
             [
-                (character_id, attr, roll["level"] if isinstance(roll, dict) else roll)
+                (character_id, attr, roll["level"])
                 for attr, roll in attributes.items()
             ],
         )
@@ -107,8 +107,7 @@ def view_characters() -> list:
                 "species": species,
                 "profile_image": "",
                 "attributes": [],
-            }
-        if attribute is not None:
+            } 
             grouped[character_id]["attributes"].append(
                 {
                     "attribute": attribute,
@@ -118,23 +117,6 @@ def view_characters() -> list:
             )
 
     return list(grouped.values())
-
-
-def view_attributes(character_id: int) -> list:
-    conn = sql.connect(db_path)
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT attribute, level FROM character_attributes WHERE character_id = ?",
-        (character_id,),
-    )
-    column = [col[0] for col in cur.description]
-    attributes = [dict(zip(column, row)) for row in cur.fetchall()]
-    conn.close()
-    return attributes
-
-
-ATTRIBUTES = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"]
-
 
 def preview_roll() -> dict:
     """Roll a random species and all attributes without persisting to the DB."""
@@ -147,3 +129,16 @@ def preview_roll() -> dict:
     species_name = row[1]
     attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
     return {"species_id": species_id, "species": species_name, "attributes": attributes}
+
+# REDUNDANT - stored in case of future usage
+# def view_attributes(character_id: int) -> list:
+#     conn = sql.connect(db_path)
+#     cur = conn.cursor()
+#     cur.execute(
+#         "SELECT attribute, level FROM character_attributes WHERE character_id = ?",
+#         (character_id,),
+#     )
+#     column = [col[0] for col in cur.description]
+#     attributes = [dict(zip(column, row)) for row in cur.fetchall()]
+#     conn.close()
+#     return attributes
