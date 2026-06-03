@@ -109,12 +109,13 @@ def view_characters() -> list:
                 "profile_image": profile_image,
                 "attributes": [],
             }
-            grouped[character_id]["attributes"].append(
-                {
-                    "attribute": attribute,
-                    "level": level,
-                    "rarity": rarity,
-                }
+        
+        grouped[character_id]["attributes"].append(
+            {
+                "attribute": attribute,
+                "level": level,
+                "rarity": rarity,
+            }
             )
 
     return list(grouped.values())
