@@ -52,7 +52,8 @@ def login():
             return redirect("/mainmenu.html")
         else:
             return render_template("/index.html", error="Invalid Credentials")
-        
+
+            
 @app.route("/mainmenu.html")
 def mainmenu():
     return render_template("mainmenu.html")
