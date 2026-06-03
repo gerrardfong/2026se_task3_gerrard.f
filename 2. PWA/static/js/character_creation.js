@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const pfpZoom = document.getElementById("pfp-zoom");
   if (!rollBtn) return;
 
-  let rolledAttributes = {};
   let finalPfpDataUrl = "";
   const rollModal = modalElement ? new bootstrap.Modal(modalElement) : null;
   const pfpModal = pfpModalElement ? new bootstrap.Modal(pfpModalElement) : null;
@@ -272,7 +271,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const el = document.getElementById("attr-" + attr);
         renderAttributeChip(el, rollData);
       }
-      rolledAttributes = data.attributes;
       finaliseBtn.disabled = false;
       renderRollModal(data.species, data.attributes);
     } catch {
@@ -285,10 +283,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   finaliseBtn.addEventListener("click", async function () {
     const name = document.getElementById("char-name").value.trim();
-    const speciesId = parseInt(document.getElementById("species-id").value, 10);
     const csrfToken = document.getElementById("csrf-token").value;
 
-    if (!name || !speciesId) {
+    if (!name) {
       alert("Please roll before finalising.");
       return;
     }
@@ -303,12 +300,7 @@ document.addEventListener("DOMContentLoaded", function () {
           "Content-Type": "application/json",
           "X-CSRFToken": csrfToken,
         },
-        body: JSON.stringify({
-          name: name,
-          species_id: speciesId,
-          attributes: rolledAttributes,
-          profile_image: finalPfpDataUrl,
-        }),
+        body: JSON.stringify({ name: name }),
       });
 
       if (!response.ok) {
