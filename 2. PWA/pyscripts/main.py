@@ -53,7 +53,7 @@ def login():
         else:
             return render_template("/index.html", error="Invalid Credentials")
 
-            
+
 @app.route("/mainmenu.html")
 def mainmenu():
     return render_template("mainmenu.html")
@@ -68,6 +68,7 @@ def character_creation():
 @app.route("/api/roll-preview")
 def api_roll_preview():
     result = dbChar.preview_roll()
+    
     return jsonify(result)
 
 

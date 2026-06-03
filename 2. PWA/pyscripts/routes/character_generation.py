@@ -128,7 +128,8 @@ def preview_roll() -> dict:
     species_id = row[0]
     species_name = row[1]
     attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
-    return {"species_id": species_id, "species": species_name, "attributes": attributes}
+    session["pending_roll"] = {"species_id": species_id, "species": species_name, "attributes": attributes}
+    return session["pending_roll"]
 
 # REDUNDANT - stored in case of future usage
 # def view_attributes(character_id: int) -> list:
