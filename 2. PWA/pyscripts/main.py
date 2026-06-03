@@ -68,7 +68,7 @@ def character_creation():
 @app.route("/api/roll-preview")
 def api_roll_preview():
     result = dbChar.preview_roll()
-    
+
     return jsonify(result)
 
 
@@ -76,11 +76,10 @@ def api_roll_preview():
 def api_create_character():
     data = request.get_json(silent=True) or {}
     name = data.get("name", "").strip()
-    species_id = data.get("species_id")
-    attributes = data.get("attributes", {})
-    if not name or not species_id or not attributes:
+    roll = session.pop("pending_roll", None)
+    if not name or not roll:
         return jsonify({"error": "Missing required fields"}), 400
-    character_id = dbChar.insert_character(name, int(species_id), attributes)
+    character_id = dbChar.insert_character(name, roll["species_id"], roll["attributes"])
     return jsonify({"character_id": character_id}), 201
 
 
