@@ -67,6 +67,10 @@ def insert_character(name, species_id, attributes: dict) -> int:
     user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
+    cur.execute("SELECT * FROM characters WHERE name=? AND user_id=?", (name, user_id))
+    if cur.fetchone():
+        conn.close()
+        return None
     cur.execute(
         "INSERT INTO characters (name, species_id, user_id) VALUES (?, ?, ?)",
         (name, species_id, user_id),
@@ -142,16 +146,22 @@ def rename_character(character_id: int, new_name: str):
     new_name = (new_name or "").strip()
     if not new_name:
         return False
+    
     user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
+    cur.execute("SELECT * FROM characters WHERE user_id = ? AND name = ? AND id<>?", (user_id, new_name, character_id))
+    if cur.fetchone():
+        conn.close()
+        return "duplicate"
+    
     cur.execute("UPDATE characters SET name = ? WHERE user_id = ? AND id = ?",
                 (new_name, user_id, character_id))
     conn.commit()
     # Validity check to see whether a row was changed or not 
     updated = cur.rowcount > 0
     conn.close()
-    return updated
+    return "success" if updated else "not_found"
 
 
 # REDUNDANT - stored in case of future usage
