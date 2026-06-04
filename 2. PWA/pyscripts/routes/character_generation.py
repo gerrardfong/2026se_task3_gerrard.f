@@ -138,7 +138,7 @@ def preview_roll() -> dict:
     }
     return session["pending_roll"]
 
-def rename_character(character_id: int, new_name: str) -> bool:
+def rename_character(character_id: int, new_name: str):
     new_name = (new_name or "").strip()
     if not new_name:
         return False

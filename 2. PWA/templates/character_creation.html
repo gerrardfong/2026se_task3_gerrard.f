@@ -24,8 +24,22 @@
                         <span class="pfp-preview-placeholder">No image</span>
                       {% endif %}
                     </div>
-                    <div>
-                      <div class="fw-bold">{{ character.name }}</div>
+                    <div class="character-name-wrap" data-character-id="{{ character.id }}">
+                      <div class="d-flex align-items-center gap-2">
+                        <div class="fw-bold character-name-display">{{ character.name }}</div>
+                        <input
+                          type="text"
+                          class="form-control form-control-sm fw-bold character-name-input d-none"
+                          value="{{ character.name }}"
+                          maxlength="50"
+                          aria-label="Rename character"
+                        >
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-link p-0 character-name-edit"
+                          aria-label="Edit name"
+                        >&#9998;</button>
+                      </div>
                       <div class="text-muted small">{{ character.species }}</div>
                     </div>
                   </div>

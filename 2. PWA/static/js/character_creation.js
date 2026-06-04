@@ -323,4 +323,99 @@ document.addEventListener("DOMContentLoaded", function () {
       finaliseBtn.textContent = "Finalise Character";
     }
   });
+
+  function enterEditMode(wrap) {
+    const display = wrap.querySelector(".character-name-display");
+    const input = wrap.querySelector(".character-name-input");
+    if (!display || !input) return;
+    input.value = display.textContent.trim();
+    display.classList.add("d-none");
+    input.classList.remove("d-none");
+    input.focus();
+    input.select();
+  }
+
+  function exitEditMode(wrap) {
+    const display = wrap.querySelector(".character-name-display");
+    const input = wrap.querySelector(".character-name-input");
+    if (!display || !input) return;
+    input.classList.add("d-none");
+    display.classList.remove("d-none");
+  }
+
+  async function saveCharacterName(wrap) {
+    const display = wrap.querySelector(".character-name-display");
+    const input = wrap.querySelector(".character-name-input");
+    const characterId = wrap.dataset.characterId;
+    const csrfToken = document.getElementById("csrf-token").value;
+    const newName = input.value.trim();
+    const currentName = display.textContent.trim();
+
+    if (!newName || newName === currentName) {
+      input.value = currentName;
+      exitEditMode(wrap);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/rename-character", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({ character_id: Number(characterId), name: newName }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        alert(data.error || "Failed to rename character.");
+        input.value = currentName;
+        exitEditMode(wrap);
+        return;
+      }
+
+      const data = await response.json();
+      display.textContent = data.name;
+      exitEditMode(wrap);
+    } catch {
+      alert("Error connecting to server. Please try again.");
+      input.value = currentName;
+      exitEditMode(wrap);
+    }
+  }
+
+  document.querySelectorAll(".character-name-wrap").forEach(function (wrap) {
+    const editBtn = wrap.querySelector(".character-name-edit");
+    const input = wrap.querySelector(".character-name-input");
+
+    if (editBtn) {
+      editBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        enterEditMode(wrap);
+      });
+    }
+
+    if (input) {
+      input.addEventListener("click", function (event) {
+        event.stopPropagation();
+      });
+      input.addEventListener("keydown", function (event) {
+        event.stopPropagation();
+        if (event.key === "Enter") {
+          event.preventDefault();
+          saveCharacterName(wrap);
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          exitEditMode(wrap);
+        }
+      });
+      input.addEventListener("blur", function () {
+        if (!input.classList.contains("d-none")) {
+          saveCharacterName(wrap);
+        }
+      });
+    }
+  });
 });
