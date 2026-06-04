@@ -8,6 +8,7 @@ app = Flask(__name__, template_folder="../templates", static_folder="../static")
 app.secret_key = b"_53oi3uriq9pifpff;apl"
 csrf = CSRFProtect(app)
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -84,6 +85,7 @@ def api_create_character():
         return jsonify({"error": "A character already has this name"}), 409
     return jsonify({"character_id": character_id}), 201
 
+
 @app.route("/api/rename-character", methods=["POST"])
 def api_rename_character():
     data = request.get_json(silent=True) or {}
@@ -92,14 +94,14 @@ def api_rename_character():
 
     if not character_id or not new_name:
         return jsonify({"error": "Missing required field"}), 400
-    
+
     result = dbChar.rename_character(character_id, new_name)
     if result == "not_found":
-        pass
+        return jsonify({"error": "Character not found"}), 404
     if result == "duplicate":
-        pass
+        return jsonify({"error": "A character already has this name"}), 409
     if result != "success":
-        pass
+        return jsonify({"error": "Invalid input"}), 400
     return jsonify({"name": new_name}), 200
 
 
