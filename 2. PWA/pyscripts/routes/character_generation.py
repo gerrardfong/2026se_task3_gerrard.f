@@ -138,6 +138,21 @@ def preview_roll() -> dict:
     }
     return session["pending_roll"]
 
+def rename_character(character_id: int, new_name: str) -> bool:
+    new_name = (new_name or "").strip()
+    if not new_name:
+        return False
+    user_id = session.get("user_id")
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute("UPDATE characters SET name = ? WHERE user_id = ? AND id = ?",
+                (new_name, user_id, character_id))
+    conn.commit()
+    # Validity check to see whether a row was changed or not 
+    updated = cur.rowcount > 0
+    conn.close()
+    return updated
+
 
 # REDUNDANT - stored in case of future usage
 # def view_attributes(character_id: int) -> list:
