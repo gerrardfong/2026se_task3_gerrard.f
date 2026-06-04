@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const pfpZoom = document.getElementById("pfp-zoom");
   if (!rollBtn) return;
 
+  const ATTRIBUTE_ORDER = ["BIQ", "IQ", "Speed", "Stamina", "Durability", "Strength"];
   let finalPfpDataUrl = "";
   const rollModal = modalElement ? new bootstrap.Modal(modalElement) : null;
   const pfpModal = pfpModalElement ? new bootstrap.Modal(pfpModalElement) : null;
@@ -226,7 +227,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!rollModal || !modalSpecies || !modalAttributes) return;
     modalSpecies.textContent = species || "-";
     modalAttributes.innerHTML = "";
-    for (const [attr, rollData] of Object.entries(attributes || {}).reverse()) {
+    for (const attr of ATTRIBUTE_ORDER.slice().reverse()) {
+      const rollData = attributes && attributes[attr];
+      if (!rollData) continue;
       const rarityCss = rarityClass(rollData.rarity);
       const li = document.createElement("li");
       li.className = "list-group-item d-flex justify-content-between align-items-center";
@@ -267,7 +270,9 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("char-species").value = data.species;
       document.getElementById("species-id").value = data.species_id;
 
-      for (const [attr, rollData] of Object.entries(data.attributes).reverse()) {
+      for (const attr of ATTRIBUTE_ORDER.slice().reverse()) {
+        const rollData = data.attributes && data.attributes[attr];
+        if (!rollData) continue;
         const el = document.getElementById("attr-" + attr);
         renderAttributeChip(el, rollData);
       }
