@@ -82,6 +82,21 @@ def api_create_character():
     character_id = dbChar.insert_character(name, roll["species_id"], roll["attributes"])
     return jsonify({"character_id": character_id}), 201
 
+@app.route("/api/rename-character", methods=["POST"])
+def api_rename_character():
+    data = request.get_json(silent=True) or {}
+    character_id = data.get("character_id")
+    new_name = data.get("name", "").strip()
+
+    if not character_id or not new_name:
+        return jsonify({"error": "Missing required field"}), 400
+    
+    success = dbChar.rename_character(character_id, new_name)
+    if not success: 
+        return jsonify({"error": "Character not found"}), 404
+    
+    return jsonify({"name": "new_name"}), 200
+
 
 @app.route("/gauntlet")
 def gauntlet():
