@@ -80,6 +80,10 @@ def api_create_character():
     roll = session.pop("pending_roll", None)
     if not name or not roll:
         return jsonify({"error": "Missing required fields"}), 400
+    pfp_data = data.get("pfp", "")
+    MAX_B64_LEN = 11 * 1024 * 1024
+    if pfp_data and len(pfp_data) > MAX_B64_LEN:
+        return jsonify({"error": "Image too large. Maximum size is 8MB."}), 413
     character_id = dbChar.insert_character(name, roll["species_id"], roll["attributes"])
     if character_id is None:
         return jsonify({"error": "A character already has this name"}), 409
@@ -104,6 +108,7 @@ def api_rename_character():
         return jsonify({"error": "Invalid input"}), 400
     return jsonify({"name": new_name}), 200
 
+
 @app.route("/api/edit-pfp", methods=["POST"])
 def api_edit_pfp():
     data = request.get_json(silent=True) or {}
@@ -111,10 +116,14 @@ def api_edit_pfp():
     new_pfp = data.get("profile_image")
     if not character_id or not new_pfp:
         return jsonify({"error": "Missing required fields"}), 400
+    MAX_B64_LEN = 11 * 1024 * 1024
+    if len(new_pfp) > MAX_B64_LEN:
+        return jsonify({"error": "Image too large. Maximum size is 8MB."}), 413
     result = dbChar.edit_pfp(new_pfp, character_id)
     if result != "success":
         return jsonify({"error": "Something went wrong"}), 400
     return jsonify({"profile_image": new_pfp}), 200
+
 
 @app.route("/api/delete-character", methods=["POST"])
 def api_delete_character():
@@ -126,6 +135,7 @@ def api_delete_character():
     if result != "success":
         return jsonify({"error": "Something went wrong."}), 404
     return jsonify({"character_id": character_id}), 200
+
 
 @app.route("/gauntlet")
 def gauntlet():

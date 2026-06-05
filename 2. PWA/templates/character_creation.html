@@ -21,6 +21,7 @@
                       {% if character.profile_image %}
                         <img class="pfp-preview" src="{{ character.profile_image }}" alt="{{ character.name }} profile image">
                       {% else %}
+                        <img class="pfp-preview d-none" src="" alt="{{ character.name }} profile image">
                         <span class="pfp-preview-placeholder">No image</span>
                       {% endif %}
                     </div>
@@ -62,6 +63,15 @@
                       <li class="list-group-item text-muted">No attributes found.</li>
                     {% endif %}
                   </ul>
+                  <div class="d-flex gap-2 mt-2">
+                    <label class="btn btn-sm btn-outline-secondary mb-0" data-character-id="{{ character.id }}">
+                      Change Photo
+                      <input type="file" class="d-none pfp-edit-input" accept="image/*">
+                    </label>
+                    <button type="button" class="btn btn-sm btn-outline-danger character-delete-btn" data-character-id="{{ character.id }}">
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </details>
             {% endfor %}

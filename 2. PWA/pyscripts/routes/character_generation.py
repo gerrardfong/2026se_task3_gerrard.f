@@ -113,14 +113,14 @@ def view_characters() -> list:
                 "profile_image": profile_image,
                 "attributes": [],
             }
-        
+
         grouped[character_id]["attributes"].append(
             {
                 "attribute": attribute,
                 "level": level,
                 "rarity": rarity,
             }
-            )
+        )
 
     return list(grouped.values())
 
@@ -142,47 +142,64 @@ def preview_roll() -> dict:
     }
     return session["pending_roll"]
 
+
 def rename_character(character_id: int, new_name: str) -> str:
     new_name = (new_name or "").strip()
     if not new_name:
         return False
-    
+
     user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("SELECT * FROM characters WHERE user_id = ? AND name = ? AND id<>?", (user_id, new_name, character_id))
+    cur.execute(
+        "SELECT * FROM characters WHERE user_id = ? AND name = ? AND id<>?",
+        (user_id, new_name, character_id),
+    )
     if cur.fetchone():
         conn.close()
         return "duplicate"
-    
-    cur.execute("UPDATE characters SET name = ? WHERE user_id = ? AND id = ?",
-                (new_name, user_id, character_id))
+
+    cur.execute(
+        "UPDATE characters SET name = ? WHERE user_id = ? AND id = ?",
+        (new_name, user_id, character_id),
+    )
     conn.commit()
-    # Validity check to see whether a row was changed or not 
+    # Validity check to see whether a row was changed or not
     updated = cur.rowcount > 0
     conn.close()
     return "success" if updated else "not_found"
+
 
 def edit_pfp(pfp: str, character_id: int) -> str:
     user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("UPDATE characters SET profile_image=? WHERE user_id=? AND id=?", (pfp, user_id, character_id))
+    cur.execute(
+        "UPDATE characters SET profile_image=? WHERE user_id=? AND id=?",
+        (pfp, user_id, character_id),
+    )
     conn.commit()
     updated = cur.rowcount > 0
     conn.close()
     return "success" if updated else "invalid"
 
+
 def delete_character(character_id: int) -> str:
     user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("DELETE FROM characters WHERE user_id=? AND id=?", (user_id, character_id))
-    conn.commit()
-    updated = cur.rowcount > 0    if updated:
-        cur.execute("DELETE FROM character_attributes WHERE character_id=?", (character_id,))
-        conn.commit()    conn.close()
+    cur.execute(
+        "DELETE FROM characters WHERE user_id=? AND id=?", (user_id, character_id)
+    )
+    updated = cur.rowcount > 0
+    if updated:
+        cur.execute(
+            "DELETE FROM character_attributes WHERE character_id=?", (character_id,)
+        )
+        conn.commit()
+    conn.close()
     return "success" if updated else "invalid"
+
 
 # REDUNDANT - stored in case of future usage
 # def view_attributes(character_id: int) -> list:

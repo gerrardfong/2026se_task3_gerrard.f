@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const ATTRIBUTE_ORDER = ["BIQ", "IQ", "Speed", "Stamina", "Durability", "Strength"];
   let finalPfpDataUrl = "";
+  let editingCharacterId = null;
+  let editingPfpImgEl = null;
   const rollModal = modalElement ? new bootstrap.Modal(modalElement) : null;
   const pfpModal = pfpModalElement ? new bootstrap.Modal(pfpModalElement) : null;
 
@@ -69,6 +71,50 @@ document.addEventListener("DOMContentLoaded", function () {
   function openCropModalFromFile(file) {
     if (!file || !file.type || !file.type.startsWith("image/")) {
       alert("Please choose an image file.");
+      return;
+    }
+
+    const MAX_SIZE_MB = 8;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      alert("Image must be under " + MAX_SIZE_MB + "MB.");
+      return;
+    }
+
+    // GIFs bypass the crop modal to preserve animation
+    if (file.type === "image/gif") {
+      const gifReader = new FileReader();
+      gifReader.onload = function (e) {
+        if (editingCharacterId) {
+          const csrfToken = document.getElementById("csrf-token").value;
+          fetch("/api/edit-pfp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+            body: JSON.stringify({ character_id: Number(editingCharacterId), profile_image: e.target.result }),
+          }).then(function (response) {
+            if (!response.ok) {
+              return response.json().then(function (d) { alert(d.error || "Failed to update photo."); });
+            }
+            if (editingPfpImgEl) {
+              editingPfpImgEl.src = e.target.result;
+              editingPfpImgEl.classList.remove("d-none");
+              const wrap = editingPfpImgEl.closest(".pfp-preview-wrap");
+              if (wrap) {
+                const placeholder = wrap.querySelector(".pfp-preview-placeholder");
+                if (placeholder) placeholder.classList.add("d-none");
+              }
+            }
+            editingCharacterId = null;
+            editingPfpImgEl = null;
+          }).catch(function () {
+            alert("Error connecting to server.");
+            editingCharacterId = null;
+            editingPfpImgEl = null;
+          });
+        } else {
+          setPreviewImage(e.target.result);
+        }
+      };
+      gifReader.readAsDataURL(file);
       return;
     }
 
@@ -220,8 +266,40 @@ document.addEventListener("DOMContentLoaded", function () {
       ctx.drawImage(cropState.img, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
 
       const dataUrl = canvas.toDataURL("image/png");
-      setPreviewImage(dataUrl);
-      if (pfpModal) pfpModal.hide();
+
+      if (editingCharacterId) {
+        // Editing an existing character's pfp
+        const csrfToken = document.getElementById("csrf-token").value;
+        fetch("/api/edit-pfp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+          body: JSON.stringify({ character_id: Number(editingCharacterId), profile_image: dataUrl }),
+        }).then(function (response) {
+          if (!response.ok) {
+            return response.json().then(function (d) { alert(d.error || "Failed to update photo."); });
+          }
+          if (editingPfpImgEl) {
+            editingPfpImgEl.src = dataUrl;
+            editingPfpImgEl.classList.remove("d-none");
+            const wrap = editingPfpImgEl.closest(".pfp-preview-wrap");
+            if (wrap) {
+              const placeholder = wrap.querySelector(".pfp-preview-placeholder");
+              if (placeholder) placeholder.classList.add("d-none");
+            }
+          }
+          editingCharacterId = null;
+          editingPfpImgEl = null;
+          if (pfpModal) pfpModal.hide();
+        }).catch(function () {
+          alert("Error connecting to server.");
+          editingCharacterId = null;
+          editingPfpImgEl = null;
+        });
+      } else {
+        // New character creation
+        setPreviewImage(dataUrl);
+        if (pfpModal) pfpModal.hide();
+      }
     });
   }
 
@@ -438,5 +516,52 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     }
+  });
+
+  // Reset editing state if crop modal is dismissed without confirming
+  if (pfpModalElement) {
+    pfpModalElement.addEventListener("hidden.bs.modal", function () {
+      editingCharacterId = null;
+      editingPfpImgEl = null;
+    });
+  }
+
+  // Handle "Change Photo" file input in the character list
+  document.addEventListener("change", function (event) {
+    if (!event.target.classList.contains("pfp-edit-input")) return;
+    const file = event.target.files && event.target.files[0];
+    const label = event.target.closest("[data-character-id]");
+    if (!file || !label) return;
+    editingCharacterId = label.dataset.characterId;
+    editingPfpImgEl = label.closest("details").querySelector(".pfp-preview");
+    openCropModalFromFile(file);
+    event.target.value = "";
+  });
+
+  // Delete character buttons
+  document.querySelectorAll(".character-delete-btn").forEach(function (btn) {
+    btn.addEventListener("click", async function () {
+      const characterId = btn.dataset.characterId;
+      const details = btn.closest("details");
+      const nameEl = details && details.querySelector(".character-name-display");
+      const name = nameEl ? nameEl.textContent.trim() : "this character";
+      if (!confirm("Delete " + name + "? This cannot be undone.")) return;
+      const csrfToken = document.getElementById("csrf-token").value;
+      try {
+        const response = await fetch("/api/delete-character", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+          body: JSON.stringify({ character_id: Number(characterId) }),
+        });
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          alert(data.error || "Failed to delete character.");
+          return;
+        }
+        if (details) details.remove();
+      } catch {
+        alert("Error connecting to server. Please try again.");
+      }
+    });
   });
 });
