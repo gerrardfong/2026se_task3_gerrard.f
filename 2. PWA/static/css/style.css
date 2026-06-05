@@ -57,6 +57,10 @@
   display: none;
 }
 
+.pfp-has-image{
+  display: block;
+}
+
 .character-dropdown .pfp-preview{
   display: block;
 }
@@ -81,7 +85,7 @@
   border-radius: 0.75rem;
   position: relative;
   overflow: hidden;
-  background: #111;
+  background: #555;
   cursor: grab;
 }
 
@@ -98,13 +102,6 @@
   -webkit-user-drag: none;
 }
 
-.pfp-crop-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  pointer-events: none;
-}
-
 .pfp-crop-circle {
   position: absolute;
   width: 72%;
@@ -112,7 +109,7 @@
   top: 14%;
   left: 14%;
   border-radius: 50%;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
   border: 2px solid #fff;
   pointer-events: none;
 }

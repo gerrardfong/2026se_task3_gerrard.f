@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function getCircleBounds() {
     if (!pfpCropStage) return { x: 0, y: 0, size: 0 };
-    const stageSize = pfpCropStage.clientWidth;
+    const stageSize = pfpCropStage.clientWidth || 320;
     const size = stageSize * 0.72;
     const offset = stageSize * 0.14;
     return { x: offset, y: offset, size: size };
@@ -79,23 +79,27 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!pfpCropStage || !pfpCropImage) return;
 
         cropState.img = img;
-        const stageSize = pfpCropStage.clientWidth || 320;
-        const circle = getCircleBounds();
-        const requiredScale = Math.max(circle.size / img.width, circle.size / img.height);
-
-        cropState.minScale = requiredScale;
-        cropState.scale = requiredScale;
-        if (pfpZoom) {
-          pfpZoom.min = String(requiredScale);
-          pfpZoom.value = String(requiredScale);
-        }
-
-        cropState.x = (stageSize - img.width * cropState.scale) / 2;
-        cropState.y = (stageSize - img.height * cropState.scale) / 2;
-        constrainCropPosition();
         pfpCropImage.src = e.target.result;
-        renderCropImage();
         if (pfpModal) pfpModal.show();
+
+        // Wait for modal to be visible so clientWidth is correct
+        setTimeout(function () {
+          const stageSize = pfpCropStage.clientWidth || 320;
+          const circle = getCircleBounds();
+          const requiredScale = Math.max(circle.size / img.width, circle.size / img.height);
+
+          cropState.minScale = requiredScale;
+          cropState.scale = requiredScale;
+          if (pfpZoom) {
+            pfpZoom.min = String(requiredScale);
+            pfpZoom.value = String(requiredScale);
+          }
+
+          cropState.x = (stageSize - img.width * cropState.scale) / 2;
+          cropState.y = (stageSize - img.height * cropState.scale) / 2;
+          constrainCropPosition();
+          renderCropImage();
+        }, 150);
       };
       img.src = e.target.result;
     };
@@ -122,9 +126,9 @@ document.addEventListener("DOMContentLoaded", function () {
     finalPfpDataUrl = dataUrl;
     if (pfpPreview) {
       pfpPreview.src = dataUrl;
-      pfpPreview.style.display = "block";
+      pfpPreview.classList.add("pfp-has-image");
     }
-    if (pfpPlaceholder) pfpPlaceholder.style.display = "none";
+    if (pfpPlaceholder) pfpPlaceholder.classList.add("d-none");
     if (pfpHiddenData) pfpHiddenData.value = dataUrl;
   }
 
@@ -158,6 +162,23 @@ document.addEventListener("DOMContentLoaded", function () {
       cropState.dragging = false;
       pfpCropStage.classList.remove("dragging");
     });
+
+    pfpCropStage.addEventListener("wheel", function (event) {
+      if (!cropState.img) return;
+      event.preventDefault();
+      const delta = event.deltaY > 0 ? -0.05 : 0.05;
+      const nextScale = Math.max(cropState.minScale, cropState.scale + delta);
+      const stageCenter = pfpCropStage.clientWidth / 2;
+      const imagePointX = (stageCenter - cropState.x) / cropState.scale;
+      const imagePointY = (stageCenter - cropState.y) / cropState.scale;
+
+      cropState.scale = nextScale;
+      cropState.x = stageCenter - imagePointX * cropState.scale;
+      cropState.y = stageCenter - imagePointY * cropState.scale;
+      if (pfpZoom) pfpZoom.value = String(nextScale);
+      constrainCropPosition();
+      renderCropImage();
+    }, { passive: false });
   }
 
   if (pfpZoom) {

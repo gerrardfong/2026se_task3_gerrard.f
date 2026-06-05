@@ -163,6 +163,11 @@ def rename_character(character_id: int, new_name: str):
     conn.close()
     return "success" if updated else "not_found"
 
+def edit_pfp(pfp):
+    pass
+
+def delete_character(character_id):
+    pass
 
 # REDUNDANT - stored in case of future usage
 # def view_attributes(character_id: int) -> list:
