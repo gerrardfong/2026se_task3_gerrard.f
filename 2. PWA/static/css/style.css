@@ -57,6 +57,10 @@
   display: none;
 }
 
+.character-dropdown .pfp-preview{
+  display: block;
+}
+
 .pfp-preview-placeholder {
   position: absolute;
   inset: 0;
@@ -148,6 +152,11 @@
 
 .character-dropdown-body {
   animation: dropdown-fade 0.2s ease;
+}
+
+.character-list-panel{
+  max-height: 620px;
+  overflow-y: auto;
 }
 
 @keyframes dropdown-fade {
