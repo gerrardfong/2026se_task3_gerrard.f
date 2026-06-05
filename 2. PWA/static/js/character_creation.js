@@ -74,14 +74,15 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const MAX_SIZE_MB = 8;
+    const MAX_SIZE_MB = 60;
     if (file.size > MAX_SIZE_MB * 1024 * 1024) {
       alert("Image must be under " + MAX_SIZE_MB + "MB.");
       return;
     }
 
     // GIFs bypass the crop modal to preserve animation
-    if (file.type === "image/gif") {
+    const isGif = file.type === "image/gif" || file.name.toLowerCase().endsWith(".gif");
+    if (isGif) {
       const gifReader = new FileReader();
       gifReader.onload = function (e) {
         if (editingCharacterId) {
@@ -97,6 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (editingPfpImgEl) {
               editingPfpImgEl.src = e.target.result;
               editingPfpImgEl.classList.remove("d-none");
+              editingPfpImgEl.classList.add("pfp-has-image");
               const wrap = editingPfpImgEl.closest(".pfp-preview-wrap");
               if (wrap) {
                 const placeholder = wrap.querySelector(".pfp-preview-placeholder");
@@ -404,7 +406,7 @@ document.addEventListener("DOMContentLoaded", function () {
           "Content-Type": "application/json",
           "X-CSRFToken": csrfToken,
         },
-        body: JSON.stringify({ name: name }),
+        body: JSON.stringify({ name: name, pfp: finalPfpDataUrl || "" }),
       });
 
       if (!response.ok) {

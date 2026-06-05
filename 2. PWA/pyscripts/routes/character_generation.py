@@ -63,8 +63,9 @@ def roll_species() -> tuple:
     return species[0]
 
 
-def insert_character(name, species_id, attributes: dict) -> int:
+def insert_character(name, species_id, attributes: dict, profile_image: str = None) -> int:
     user_id = session.get("user_id")
+    profile_image = profile_image or "/static/icons/default_pfp.png"
     conn = sql.connect(db_path)
     cur = conn.cursor()
     cur.execute("SELECT * FROM characters WHERE name=? AND user_id=?", (name, user_id))
@@ -72,8 +73,8 @@ def insert_character(name, species_id, attributes: dict) -> int:
         conn.close()
         return None
     cur.execute(
-        "INSERT INTO characters (name, species_id, user_id) VALUES (?, ?, ?)",
-        (name, species_id, user_id),
+        "INSERT INTO characters (name, species_id, user_id, profile_image) VALUES (?, ?, ?, ?)",
+        (name, species_id, user_id, profile_image),
     )
     character_id = cur.lastrowid
     if attributes:

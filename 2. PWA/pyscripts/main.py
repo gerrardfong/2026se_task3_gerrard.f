@@ -88,12 +88,12 @@ def api_create_character():
         "data:image/gif;",
         "data:image/webp;",
     )
-    MAX_B64_LEN = 50 * 1024 * 1024
+    MAX_B64_LEN = 80 * 1024 * 1024
     if pfp_data and not pfp_data.startswith(ALLOWED_PREFIXES):
         return jsonify({"error": "Invalid image format"}), 400
     if pfp_data and len(pfp_data) > MAX_B64_LEN:
-        return jsonify({"error": "Image too large. Maximum size is 8MB."}), 413
-    character_id = dbChar.insert_character(name, roll["species_id"], roll["attributes"])
+        return jsonify({"error": "Image too large. Maximum size is 31MB."}), 413
+    character_id = dbChar.insert_character(name, roll["species_id"], roll["attributes"], pfp_data or None)
     # This is AI, it's just so I can use GIFs ^^^^^
     if character_id is None:
         return jsonify({"error": "A character already has this name"}), 409
@@ -133,11 +133,11 @@ def api_edit_pfp():
         "data:image/gif;",
         "data:image/webp;",
     )
-    MAX_B64_LEN = 50 * 1024 * 1024
+    MAX_B64_LEN = 80 * 1024 * 1024
     if not new_pfp.startswith(ALLOWED_PREFIXES):
         return jsonify({"error": "Invalid image format"}), 400
     if len(new_pfp) > MAX_B64_LEN:
-        return jsonify({"error": "Image too large. Maximum size is 8MB."}), 413
+        return jsonify({"error": "Image too large. Maximum size is 31MB."}), 413
     # This is AI, it's just so I can use GIFs ^^^^^
     result = dbChar.edit_pfp(new_pfp, character_id)
     if result != "success":
