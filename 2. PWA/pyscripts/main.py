@@ -1,3 +1,4 @@
+import os
 from flask import Flask, redirect, request, session, url_for, jsonify, render_template
 from flask_wtf import CSRFProtect
 from flask_csp.csp import csp_header
@@ -5,7 +6,7 @@ from routes import userManagement as dbUser
 from routes import character_generation as dbChar
 
 app = Flask(__name__, template_folder="../templates", static_folder="../static")
-app.secret_key = b"_53oi3uriq9pifpff;apl"
+app.secret_key = os.urandom(24)
 app.config["MAX_CONTENT_LENGTH"] = 80 * 1024 * 1024  # 80MB max upload
 csrf = CSRFProtect(app)
 
