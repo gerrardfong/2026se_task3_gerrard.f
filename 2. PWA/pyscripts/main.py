@@ -104,6 +104,28 @@ def api_rename_character():
         return jsonify({"error": "Invalid input"}), 400
     return jsonify({"name": new_name}), 200
 
+@app.route("/api/edit-pfp", methods=["POST"])
+def api_edit_pfp():
+    data = request.get_json(silent=True) or {}
+    character_id = data.get("character_id")
+    new_pfp = data.get("profile_image")
+    if not character_id or not new_pfp:
+        return jsonify({"error": "Missing required fields"}), 400
+    result = dbChar.edit_pfp(new_pfp, character_id)
+    if result != "success":
+        return jsonify({"error": "Something went wrong"}), 400
+    return jsonify({"profile_image": new_pfp}), 200
+
+@app.route("/api/delete-character", methods=["POST"])
+def api_delete_character():
+    data = request.get_json(silent=True) or {}
+    character_id = data.get("character_id")
+    if not character_id:
+        return jsonify({"error": "Invalid character"}), 400
+    result = dbChar.delete_character(character_id)
+    if result != "success":
+        return jsonify({"error": "Something went wrong."}), 404
+    return jsonify({"character_id": character_id}), 200
 
 @app.route("/gauntlet")
 def gauntlet():

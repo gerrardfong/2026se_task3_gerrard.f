@@ -50,7 +50,7 @@ def roll_attribute(attribute, character_id) -> str:
     return roll
 
 
-def roll_species():
+def roll_species() -> tuple:
     rarity = rarity_generation()
     conn = sql.connect(db_path)
     cur = conn.cursor()
@@ -142,7 +142,7 @@ def preview_roll() -> dict:
     }
     return session["pending_roll"]
 
-def rename_character(character_id: int, new_name: str):
+def rename_character(character_id: int, new_name: str) -> str:
     new_name = (new_name or "").strip()
     if not new_name:
         return False
@@ -163,11 +163,26 @@ def rename_character(character_id: int, new_name: str):
     conn.close()
     return "success" if updated else "not_found"
 
-def edit_pfp(pfp):
-    pass
+def edit_pfp(pfp: str, character_id: int) -> str:
+    user_id = session.get("user_id")
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute("UPDATE characters SET profile_image=? WHERE user_id=? AND id=?", (pfp, user_id, character_id))
+    conn.commit()
+    updated = cur.rowcount > 0
+    conn.close()
+    return "success" if updated else "invalid"
 
-def delete_character(character_id):
-    pass
+def delete_character(character_id: int) -> str:
+    user_id = session.get("user_id")
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute("DELETE FROM characters WHERE user_id=? AND id=?", (user_id, character_id))
+    conn.commit()
+    updated = cur.rowcount > 0    if updated:
+        cur.execute("DELETE FROM character_attributes WHERE character_id=?", (character_id,))
+        conn.commit()    conn.close()
+    return "success" if updated else "invalid"
 
 # REDUNDANT - stored in case of future usage
 # def view_attributes(character_id: int) -> list:
