@@ -58,24 +58,31 @@ def login():
 
 @app.route("/mainmenu.html")
 def mainmenu():
+    if not session.get("user_id"):
+        return redirect("/index.html")
     return render_template("mainmenu.html")
 
 
 @app.route("/character-creation")
 def character_creation():
+    if not session.get("user_id"):
+        return redirect("/index.html")
     characters = dbChar.view_characters()
     return render_template("character_creation.html", characters=characters)
 
 
 @app.route("/api/roll-preview")
 def api_roll_preview():
+    if not session.get("user_id"):
+        return redirect("/index.html")
     result = dbChar.preview_roll()
-
     return jsonify(result)
 
 
 @app.route("/api/create-character", methods=["POST"])
 def api_create_character():
+    if not session.get("user_id"):
+        return redirect("/index.html")
     data = request.get_json(silent=True) or {}
     name = data.get("name", "").strip()
     roll = session.pop("pending_roll", None)
@@ -105,6 +112,8 @@ def api_create_character():
 
 @app.route("/api/rename-character", methods=["POST"])
 def api_rename_character():
+    if not session.get("user_id"):
+        return redirect("/index.html")
     data = request.get_json(silent=True) or {}
     character_id = data.get("character_id")
     new_name = data.get("name", "").strip()
@@ -150,6 +159,8 @@ def api_edit_pfp():
 
 @app.route("/api/delete-character", methods=["POST"])
 def api_delete_character():
+    if not session.get("user_id"):
+        return redirect("/index.html")
     data = request.get_json(silent=True) or {}
     character_id = data.get("character_id")
     if not character_id:
@@ -162,6 +173,8 @@ def api_delete_character():
 
 @app.route("/gauntlet")
 def gauntlet():
+    if not session.get("user_id"):
+        return redirect("/index.html")
     return render_template("gauntlet.html")
 
 
