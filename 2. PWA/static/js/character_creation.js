@@ -80,9 +80,15 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // GIFs bypass the crop modal to preserve animation
-    const isGif = file.type === "image/gif" || file.name.toLowerCase().endsWith(".gif");
-    if (isGif) {
+    // Read first 6 bytes to detect GIF magic bytes (GIF87a / GIF89a)
+    const headerSlice = file.slice(0, 6);
+    const headerReader = new FileReader();
+    headerReader.onload = function (headerEvt) {
+      const bytes = new Uint8Array(headerEvt.target.result);
+      // GIF magic: 47 49 46 38 (G I F 8)
+      const isGifBytes = bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x38;
+      const isGif = isGifBytes || file.type === "image/gif" || file.name.toLowerCase().endsWith(".gif");
+      if (isGif) {
       const gifReader = new FileReader();
       gifReader.onload = function (e) {
         if (editingCharacterId) {
@@ -108,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
             editingCharacterId = null;
             editingPfpImgEl = null;
           }).catch(function () {
-            alert("Error connecting to server.");
+            alert("Error connecting to server (GIF edit).");
             editingCharacterId = null;
             editingPfpImgEl = null;
           });
@@ -117,13 +123,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       };
       gifReader.readAsDataURL(file);
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const img = new Image();
-      img.onload = function () {
+      } else {
+        // Not a GIF — open crop modal
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = function () {
         if (!pfpCropStage || !pfpCropImage) return;
 
         cropState.img = img;
@@ -150,8 +155,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 150);
       };
       img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
     };
-    reader.readAsDataURL(file);
+    headerReader.readAsArrayBuffer(headerSlice);
   }
 
   function onPasteImage(event) {
@@ -293,7 +301,7 @@ document.addEventListener("DOMContentLoaded", function () {
           editingPfpImgEl = null;
           if (pfpModal) pfpModal.hide();
         }).catch(function () {
-          alert("Error connecting to server.");
+          alert("Error connecting to server (crop save).");
           editingCharacterId = null;
           editingPfpImgEl = null;
         });
@@ -380,9 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
       finaliseBtn.disabled = false;
       renderRollModal(data.species, data.attributes);
     } catch {
-      alert("Error connecting to server. Please try again.");
-    } finally {
-      rollBtn.disabled = false;
+      alert("Error connecting to server (roll).");
       rollBtn.textContent = "Re-roll Species & Attributes";
     }
   });
@@ -480,7 +486,7 @@ document.addEventListener("DOMContentLoaded", function () {
       display.textContent = data.name;
       exitEditMode(wrap);
     } catch {
-      alert("Error connecting to server. Please try again.");
+      alert("Error connecting to server (rename).");
       input.value = currentName;
       exitEditMode(wrap);
     }
@@ -562,7 +568,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         if (details) details.remove();
       } catch {
-        alert("Error connecting to server. Please try again.");
+        alert("Error connecting to server (delete).");
       }
     });
   });
