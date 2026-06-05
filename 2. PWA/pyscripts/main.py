@@ -80,11 +80,21 @@ def api_create_character():
     roll = session.pop("pending_roll", None)
     if not name or not roll:
         return jsonify({"error": "Missing required fields"}), 400
+    # This is AI, it's just so I can use GIFs 
     pfp_data = data.get("pfp", "")
-    MAX_B64_LEN = 11 * 1024 * 1024
+    ALLOWED_PREFIXES = (
+        "data:image/png;",
+        "data:image/jpeg;",
+        "data:image/gif;",
+        "data:image/webp;",
+    )
+    MAX_B64_LEN = 50 * 1024 * 1024
+    if pfp_data and not pfp_data.startswith(ALLOWED_PREFIXES):
+        return jsonify({"error": "Invalid image format"}), 400
     if pfp_data and len(pfp_data) > MAX_B64_LEN:
         return jsonify({"error": "Image too large. Maximum size is 8MB."}), 413
     character_id = dbChar.insert_character(name, roll["species_id"], roll["attributes"])
+    # This is AI, it's just so I can use GIFs ^^^^^
     if character_id is None:
         return jsonify({"error": "A character already has this name"}), 409
     return jsonify({"character_id": character_id}), 201
@@ -114,11 +124,21 @@ def api_edit_pfp():
     data = request.get_json(silent=True) or {}
     character_id = data.get("character_id")
     new_pfp = data.get("profile_image")
+    # This is AI, it's just so I can use GIFs
     if not character_id or not new_pfp:
         return jsonify({"error": "Missing required fields"}), 400
-    MAX_B64_LEN = 11 * 1024 * 1024
+    ALLOWED_PREFIXES = (
+        "data:image/png;",
+        "data:image/jpeg;",
+        "data:image/gif;",
+        "data:image/webp;",
+    )
+    MAX_B64_LEN = 50 * 1024 * 1024
+    if not new_pfp.startswith(ALLOWED_PREFIXES):
+        return jsonify({"error": "Invalid image format"}), 400
     if len(new_pfp) > MAX_B64_LEN:
         return jsonify({"error": "Image too large. Maximum size is 8MB."}), 413
+    # This is AI, it's just so I can use GIFs ^^^^^
     result = dbChar.edit_pfp(new_pfp, character_id)
     if result != "success":
         return jsonify({"error": "Something went wrong"}), 400
