@@ -372,6 +372,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const response = await fetch("/api/roll-preview");
       if (!response.ok) {
         alert("Failed to roll. Please try again.");
+        rollBtn.disabled = false;
+        rollBtn.textContent = "Roll Species & Attributes";
         return;
       }
       const data = await response.json();
@@ -386,10 +388,13 @@ document.addEventListener("DOMContentLoaded", function () {
         renderAttributeChip(el, rollData);
       }
       finaliseBtn.disabled = false;
+      rollBtn.disabled = false;
+      rollBtn.textContent = "Re-roll Species & Attributes";
       renderRollModal(data.species, data.attributes);
     } catch {
       alert("Error connecting to server (roll).");
-      rollBtn.textContent = "Re-roll Species & Attributes";
+      rollBtn.disabled = false;
+      rollBtn.textContent = "Roll Species & Attributes";
     }
   });
 

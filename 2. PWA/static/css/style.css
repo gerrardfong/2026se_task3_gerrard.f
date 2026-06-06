@@ -152,7 +152,7 @@
 }
 
 .character-list-panel{
-  max-height: 620px;
+  max-height: 767px;
   overflow-y: auto;
 }
 
