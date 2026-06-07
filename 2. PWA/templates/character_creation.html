@@ -2,7 +2,206 @@
 
 {% block content %}
 <div class="container my-5">
-  <h1 class="display-4 fw-bold">Character Creation</h1>
-  <p class="text-muted">This page is under construction.</p>
+  <h1 class="display-4 fw-bold">Characters</h1>
 </div>
+<div class="container mb-5">
+  <div class="row g-4">
+
+    <!-- Left box: scrollable character list from DB -->
+    <div class="col-12 col-md-6">
+      <div class="border border-2 rounded-4 p-4 bg-white character-list-panel">
+        <h2 class="h5 mb-3">Your Characters</h2>
+        {% if characters %}
+          <div class="d-grid gap-3">
+            {% for character in characters %}
+              <details class="character-dropdown border rounded-4 bg-light-subtle">
+                <summary class="character-dropdown-summary d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="pfp-preview-wrap">
+                      {% if character.profile_image %}
+                        <img class="pfp-preview" src="{{ character.profile_image }}" alt="{{ character.name }} profile image">
+                      {% else %}
+                        <img class="pfp-preview d-none" src="" alt="{{ character.name }} profile image">
+                        <span class="pfp-preview-placeholder">No image</span>
+                      {% endif %}
+                    </div>
+                    <div class="character-name-wrap" data-character-id="{{ character.id }}">
+                      <div class="d-flex align-items-center gap-2">
+                        <div class="fw-bold character-name-display">{{ character.name }}</div>
+                        <input
+                          type="text"
+                          class="form-control form-control-sm fw-bold character-name-input d-none"
+                          value="{{ character.name }}"
+                          maxlength="50"
+                          aria-label="Rename character"
+                        >
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-link p-0 character-name-edit"
+                          aria-label="Edit name"
+                        >&#9998;</button>
+                      </div>
+                      <div class="text-muted small">{{ character.species }}</div>
+                    </div>
+                  </div>
+                  <span class="character-dropdown-arrow text-muted">Show</span>
+                </summary>
+
+                <div class="character-dropdown-body p-3 pt-0">
+                  <ul class="list-group list-group-flush border rounded-3">
+                    {% if character.attributes %}
+                      {% for attr in character.attributes %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                          <span>{{ attr.attribute }}</span>
+                          <span>
+                            <strong class="roll-level">{{ attr.level }}</strong>
+                            <span class="roll-rarity rarity-{{ attr.rarity }}">({{ attr.rarity }})</span>
+                          </span>
+                        </li>
+                      {% endfor %}
+                    {% else %}
+                      <li class="list-group-item text-muted">No attributes found.</li>
+                    {% endif %}
+                  </ul>
+                  <div class="d-flex gap-2 mt-2">
+                    <label class="btn btn-sm btn-outline-secondary mb-0" data-character-id="{{ character.id }}">
+                      Change Photo
+                      <input type="file" class="d-none pfp-edit-input" accept="image/*">
+                    </label>
+                    <button type="button" class="btn btn-sm btn-outline-danger character-delete-btn" data-character-id="{{ character.id }}">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </details>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="border rounded-3 p-3 text-muted">No characters yet. Create one!</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right box: character creation form -->
+    <div class="col-12 col-md-6">
+      <div class="border border-2 rounded-4 p-4 bg-white">
+        <h2 class="h5 mb-3">Create a Character</h2>
+        <form id="character-creation-form" novalidate>
+          <input type="hidden" id="csrf-token" value="{{ csrf_token() }}">
+          <input type="hidden" id="species-id" value="">
+
+          <!-- Name -->
+          <div class="mb-3">
+            <label for="char-name" class="form-label fw-semibold">Name</label>
+            <input type="text" class="form-control" id="char-name" placeholder="Enter character name" required>
+          </div>
+
+          <!-- Profile Picture -->
+          <div class="mb-3">
+            <label for="char-pfp" class="form-label fw-semibold">Profile Picture</label>
+            <div class="d-flex align-items-center gap-3">
+              <div class="flex-grow-1">
+                <input type="file" class="form-control" id="char-pfp" accept="image/*">
+                <small class="text-muted">You can paste an image or choose a file, then crop it.</small>
+              </div>
+              <div class="pfp-preview-wrap">
+                <img id="char-pfp-preview" class="pfp-preview" src="" alt="Profile picture preview">
+                <span id="char-pfp-placeholder" class="pfp-preview-placeholder">No image</span>
+              </div>
+            </div>
+            <input type="hidden" id="char-pfp-data" value="">
+          </div>
+
+          <!-- Species (read-only, populated after roll) -->
+          <div class="mb-3">
+            <label for="char-species" class="form-label fw-semibold">Species</label>
+            <input type="text" class="form-control" id="char-species" readonly placeholder="Roll to discover">
+          </div>
+
+          <!-- Attributes -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Attributes</label>
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Strength <span id="attr-Strength" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Durability <span id="attr-Durability" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Stamina <span id="attr-Stamina" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Speed <span id="attr-Speed" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                IQ <span id="attr-IQ" class="badge bg-secondary">-</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                BIQ <span id="attr-BIQ" class="badge bg-secondary">-</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Roll button -->
+          <button type="button" class="btn btn-secondary w-100 mb-2" id="roll-btn">
+            Roll Species &amp; Attributes
+          </button>
+
+          <!-- Finalise button -->
+          <button type="button" class="btn btn-dark w-100" id="finalise-btn" disabled>
+            Finalise Character
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal fade" id="rollResultModal" tabindex="-1" aria-labelledby="rollResultModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rollResultModalLabel">Roll Result</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2"><strong>Species:</strong> <span id="modal-species">-</span></p>
+        <ul class="list-group" id="modal-attributes"></ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="pfpCropModal" tabindex="-1" aria-labelledby="pfpCropModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pfpCropModalLabel">Adjust Profile Picture</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-2">Drag the image so the circle frames your avatar, then submit.</p>
+        <div class="pfp-crop-stage" id="pfp-crop-stage">
+          <img id="pfp-crop-image" class="pfp-crop-image" alt="Crop source">
+          <div class="pfp-crop-circle"></div>
+        </div>
+        <label for="pfp-zoom" class="form-label mt-3 mb-1">Zoom</label>
+        <input type="range" class="form-range" id="pfp-zoom" min="1" max="3" step="0.01" value="1">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-dark" id="pfp-crop-confirm">Use This Picture</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/character_creation.js"></script>
 {% endblock %}

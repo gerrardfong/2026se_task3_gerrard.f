@@ -1,20 +1,23 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="menu-bg">
-  <div class="menu-bg-blur"></div>
-  <div class="menu-wrapper">
-    <h1 class="menu-title">RNSouls</h1>
-    <div class="menu-cards">
-      <div class="menu-card">
-        <h2 class="menu-card-title">Gauntlet</h2>
-        <p class="menu-card-desc">Face endless waves of enemies in a brutal test of survival.</p>
-        <a href="/gauntlet" class="btn menu-btn">Play Gauntlet</a>
+<div class="container d-flex flex-column justify-content-center py-5">
+  <h1 class="display-4 text-center mb-5">RNSouls</h1>
+
+  <div class="row g-4 justify-content-center">
+    <div class="col-12 col-md-6 col-lg-5">
+      <div class="menu-card border border-2 rounded-4 p-4 h-100 bg-white text-center d-flex flex-column justify-content-between">
+        <h2 class="h4 mb-3">Gauntlet</h2>
+        <p class="mb-4">Face endless waves of enemies in a brutal test of survival.</p>
+        <a href="/gauntlet" class="btn btn-dark w-100">Play Gauntlet</a>
       </div>
-      <div class="menu-card">
-        <h2 class="menu-card-title">Character Creation</h2>
-        <p class="menu-card-desc">Forge your warrior. Choose your species, attributes, and destiny.</p>
-        <a href="/character-creation" class="btn menu-btn">Create Character</a>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-5">
+      <div class="menu-card border border-2 rounded-4 p-4 h-100 bg-white text-center d-flex flex-column justify-content-between">
+        <h2 class="h4 mb-3">Character Creation</h2>
+        <p class="mb-4">Forge your warrior. Choose your species, attributes, and destiny.</p>
+        <a href="/character-creation" class="btn btn-dark w-100">Create Character</a>
       </div>
     </div>
   </div>
