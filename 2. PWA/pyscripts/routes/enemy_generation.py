@@ -43,25 +43,19 @@ ENEMY_TIER_WEIGHTS = {
     "Mythic": 1,
     "Ultra": 0.5,
 },
-
     "Hard": {
-    "Common": 10,
-    "Uncommon": 10,
-    "Rare": 10,
-    "Epic": 6,
-    "Legendary": 2.5,
-    "Mythic": 1,
-    "Ultra": 0.5,
+    "Rare": 50,
+    "Epic": 25,
+    "Legendary": 17.5,
+    "Mythic": 5,
+    "Ultra": 2.5,
 },
 
     "Impossible": {
-    "Common": 60,
-    "Uncommon": 15,
-    "Rare": 10,
-    "Epic": 6,
-    "Legendary": 2.5,
-    "Mythic": 1,
-    "Ultra": 0.5,
+    "Epic": 20,
+    "Legendary": 40,
+    "Mythic": 30,
+    "Ultra": 10,
 },
 }
 

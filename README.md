@@ -29,7 +29,12 @@ Working on Gauntlet gamemode where players will be able to use their character i
         - Player can select a character they want to put into gauntlet
         - Universal leaderboard that all players can see for competitiveness
 
-Development Goals:
+Sprint 3:
+- Plan:
+    - Implement Player vs Player
+    - Add Offline mode and Quality of life features
+
+Development Log:
 8/6/2026
 1. Identify and begin functions for gauntlet:
     - generate_enemy(name, pfp) - randomly generate attributes for an enemy character
@@ -57,7 +62,19 @@ Development Goals:
     - add an xp bar that is attached to character table and increases depending on the amount of enemies that player has eliminated
     - amount of xp scales depending on enemy difficulty
 
-Sprint 3:
-- Plan:
-    - Implement Player vs Player
-    - Add Offline mode and Quality of life features
+- Add a re-roll function prompt for users to re-roll specific attributes in the case that I decide to change the list of tiers
+    - This activates only in specific cases
+
+- Implement species_buffs functions so that they impact character attributes:
+    - requires me to reform rarities by adding a level identifier in order to use the species_buff values or I can use the auto-increment id
+
+I've realised that the order in which I get things done will be much more complicated than anticipated due to client requests and reformatting of existing structures. This means that each sprint can't exactly have a defined purpose or feature as it will be constantly changing.
+
+This sprint will most likely be targetted at:
+    - implementing species_buffs
+    - xp thresholds
+    - adding the prompt in the case that I want to change the rarities
+    - finishing enemy character generation since I've already started it 
+
+Sprint 3 can be for gauntlet.
+
