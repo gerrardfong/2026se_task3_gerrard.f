@@ -29,6 +29,20 @@ Working on Gauntlet gamemode where players will be able to use their character i
         - Player can select a character they want to put into gauntlet
         - Universal leaderboard that all players can see for competitiveness
 
+Development Goals:
+8/6/2026
+1. Identify and begin functions for gauntlet:
+    - generate_enemy(name, pfp) - randomly generate attributes for an enemy character
+    - increase rarity rates for enemies to increase difficulty
+        - get_enemyname() - generates a random name for enemy
+        - get_enemypfp() - generates a random pfp for enemy
+    - generate_gauntlet(int) - creates a gauntlet depending on the amount of enemies parsed
+
+2. Identify HTML and CSS layout:
+    - Plan is to have two containers left side containing a selected character's data, the right having the list of enemies with a descending box size the higher 'level' in the gauntlet they are
+    - There will be a large popup that blurs the previous background that was described and allows the user to select a character to fight
+    - Possibly create/import victory/defeat animation
+
 Sprint 3:
 - Plan:
     - Implement Player vs Player
