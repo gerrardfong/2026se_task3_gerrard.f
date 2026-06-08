@@ -51,6 +51,12 @@ Development Goals:
     - Create a name db and a pfp db that allows functions to pull random images from each
     - Decide whether to merge enemies into character db or create a separate db
 
+8/6/2026 - Later at night:
+- I'm thinking about adding an xp system and choosing whether I have to add columns onto character and rarities table
+    - add a threshold column which is the required amount of xp to allow players to upgrade their attributes, increases the higher the level
+    - add an xp bar that is attached to character and increases depending on the amount of enemies that player has eliminated
+    - amount of xp scales depending on enemy difficulty
+
 Sprint 3:
 - Plan:
     - Implement Player vs Player

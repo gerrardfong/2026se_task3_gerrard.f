@@ -32,6 +32,39 @@ RANDOM_PFP = [
     "/static/images/enemies/enemy1.png"
 ]
 
+ENEMY_TIER_WEIGHTS = {
+    "Easy": dbChar.RARITY_WEIGHTS,
+    "Intermediate": {
+    "Common": 30,
+    "Uncommon": 30,
+    "Rare": 21,
+    "Epic": 15,
+    "Legendary": 2.5,
+    "Mythic": 1,
+    "Ultra": 0.5,
+},
+
+    "Hard": {
+    "Common": 10,
+    "Uncommon": 10,
+    "Rare": 10,
+    "Epic": 6,
+    "Legendary": 2.5,
+    "Mythic": 1,
+    "Ultra": 0.5,
+},
+
+    "Impossible": {
+    "Common": 60,
+    "Uncommon": 15,
+    "Rare": 10,
+    "Epic": 6,
+    "Legendary": 2.5,
+    "Mythic": 1,
+    "Ultra": 0.5,
+},
+}
+
 def get_name() -> str:
     prefix = random.choice(RANDOM_NAMES["prefixes"])
     suffix = random.choice(RANDOM_NAMES["suffixes"])
@@ -45,5 +78,7 @@ def get_name() -> str:
 def get_pfp() -> str:
     return random.choice(RANDOM_PFP)
 
-def create_enemy(name: str, pfp: str) -> dict:
-    attributes = 
+def create_enemy() -> dict:
+    user_id = None
+    attributes = {}
+    
