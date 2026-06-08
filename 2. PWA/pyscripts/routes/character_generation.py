@@ -11,8 +11,7 @@ RARITY_WEIGHTS = {
     "Epic": 6,
     "Legendary": 2.5,
     "Mythic": 1,
-    "Ultra": 0.49,
-    "diddenbludden": 0.01,
+    "Ultra": 0.5,
 }
 
 ATTRIBUTES = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"]
