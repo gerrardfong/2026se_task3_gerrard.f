@@ -53,8 +53,8 @@ Development Goals:
 
 8/6/2026 - Later at night:
 - I'm thinking about adding an xp system and choosing whether I have to add columns onto character and rarities table
-    - add a threshold column which is the required amount of xp to allow players to upgrade their attributes, increases the higher the level
-    - add an xp bar that is attached to character and increases depending on the amount of enemies that player has eliminated
+    - add a threshold column which is the required amount of xp to allow players to upgrade their attributes, increases the higher the level, link to rarities table
+    - add an xp bar that is attached to character table and increases depending on the amount of enemies that player has eliminated
     - amount of xp scales depending on enemy difficulty
 
 Sprint 3:
