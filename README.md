@@ -43,6 +43,14 @@ Development Goals:
     - There will be a large popup that blurs the previous background that was described and allows the user to select a character to fight
     - Possibly create/import victory/defeat animation
 
+3. Identify flask routes:
+    - display_enemy() - shows data according to each individual enemy
+    - generate_gauntlet()
+
+4. Enemy database:
+    - Create a name db and a pfp db that allows functions to pull random images from each
+    - Decide whether to merge enemies into character db or create a separate db
+
 Sprint 3:
 - Plan:
     - Implement Player vs Player
