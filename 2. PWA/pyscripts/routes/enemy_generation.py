@@ -29,14 +29,21 @@ RANDOM_NAMES = {
 
 # path for copy and paste: /static/images/enemies/
 RANDOM_PFP = [
-    ""
+    "/static/images/enemies/enemy1.png"
 ]
 
 def get_name() -> str:
-    pass
+    prefix = random.choice(RANDOM_NAMES["prefixes"])
+    suffix = random.choice(RANDOM_NAMES["suffixes"])
+    if suffix.islower():
+        name = prefix + suffix
+        return name
+    else:
+        name = prefix + " " + suffix
+        return name
 
 def get_pfp() -> str:
-    pass
+    return random.choice(RANDOM_PFP)
 
 def create_enemy(name: str, pfp: str) -> dict:
     pass
