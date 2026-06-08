@@ -62,8 +62,9 @@ def roll_species() -> tuple:
     return species[0]
 
 
-def insert_character(name, species_id, attributes: dict, profile_image: str = None) -> int:
-    user_id = session.get("user_id")
+def insert_character(name: str, species_id: int , attributes: dict, profile_image: str = None,  user_id: int = "user") -> int:
+    if user_id == "user":
+        user_id = session.get("user_id")
     profile_image = profile_image or "/static/icons/default_pfp.png"
     conn = sql.connect(db_path)
     cur = conn.cursor()
