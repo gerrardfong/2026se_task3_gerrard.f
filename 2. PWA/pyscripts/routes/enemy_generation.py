@@ -46,4 +46,4 @@ def get_pfp() -> str:
     return random.choice(RANDOM_PFP)
 
 def create_enemy(name: str, pfp: str) -> dict:
-    pass
+    attributes = 
