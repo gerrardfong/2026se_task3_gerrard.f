@@ -59,6 +59,13 @@ ENEMY_TIER_WEIGHTS = {
 },
 }
 
+XP_VALUES = {
+    "Easy": "1",
+    "Intermediate": "20",
+    "Hard": "50",
+    "Impossible": "100",
+}
+
 def get_name() -> str:
     prefix = random.choice(RANDOM_NAMES["prefixes"])
     suffix = random.choice(RANDOM_NAMES["suffixes"])
@@ -72,7 +79,8 @@ def get_name() -> str:
 def get_pfp() -> str:
     return random.choice(RANDOM_PFP)
 
+
 def create_enemy() -> dict:
+    #Enemies should contain a specific xp value depending on their enemy tier
     user_id = None
     attributes = {}
-    

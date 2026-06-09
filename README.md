@@ -79,4 +79,7 @@ This sprint will most likely be targetted at:
 Sprint 3 can be for gauntlet.
 
 9/6/2026
-- Complete new database structures and begin development for species_buffs
+- Complete new database structures:
+    - Add xp column to characters
+    - Add threshold column to rarities
+- Begin development for species_buffs
