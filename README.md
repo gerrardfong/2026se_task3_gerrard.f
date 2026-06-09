@@ -78,3 +78,5 @@ This sprint will most likely be targetted at:
 
 Sprint 3 can be for gauntlet.
 
+9/6/2026
+- Complete new database structures and begin development for species_buffs
