@@ -6,3 +6,4 @@ requests
 ipython-sql==0.5.0
 prettytable==3.9.0
 jupyterlab
+ipykernel

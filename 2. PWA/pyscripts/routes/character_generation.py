@@ -201,22 +201,15 @@ def delete_character(character_id: int) -> str:
     conn.close()
     return "success" if updated else "invalid"
 
-def species_buffs(attribute: list) -> dict:
-    user_id = session.get("user_id")
+def get_species_buffs(species_id: int) -> dict:
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    for attr in attribute:
-        cur.execute()
-        cur.execute(
-        """UPDATE r.id, ca.level, ca.attribute, ca.character_id, c.id, c.user_id
-            JOIN ca.level=r.id
-            SET ca.level=?
-            FROM ca character_attributes 
-            JOIN ca.character_id = c.id
-            WHERE user_id=? """,
-            ()
-        )
-    pass
+    cur.execute(
+        "SELECT attribute, level_modifier FROM species_buffs WHERE species_id=?",(species_id,)
+    )
+    modifiers = cur.fetchall()
+    
+
 
 def xp_gain():
     pass
