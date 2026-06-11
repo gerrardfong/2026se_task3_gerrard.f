@@ -207,8 +207,25 @@ def get_species_buffs(species_id: int) -> dict:
     cur.execute(
         "SELECT attribute, level_modifier FROM species_buffs WHERE species_id=?",(species_id,)
     )
-    modifiers = cur.fetchall()
-    
+    results = cur.fetchall()
+    conn.close()
+    # Should build a dict in the format of: {"Strength": "2"}
+    return {row[0]: row[1] for row in results}
+
+def apply_species_buffs(species_id: int, character_id: int) -> str:
+    buffs = get_species_buffs(species_id)
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.executemany(
+        """UPDATE character_attributes SET level=? WHERE attribute=? AND character_id=?""",
+        [(level, attribute, character_id) for attribute, level in buffs.items()]
+    )
+    if cur.rowcount < 1:
+        conn.close()
+        return "human"
+    conn.commit()
+    conn.close()
+    return "updated"
 
 
 def xp_gain():
