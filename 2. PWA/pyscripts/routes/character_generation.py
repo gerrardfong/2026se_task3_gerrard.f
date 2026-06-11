@@ -82,9 +82,11 @@ def insert_character(name: str, species_id: int , attributes: dict, profile_imag
             "INSERT INTO character_attributes (character_id, attribute, level) VALUES (?,?,?)",
             [(character_id, attr, roll["level"]) for attr, roll in attributes.items()],
         )
-        apply_species_buffs(species_id, character_id, True, False)
     conn.commit()
     conn.close()
+    #condition added to make function look tidier 
+    if attributes:
+        apply_species_buffs(species_id, character_id, "insert")
     return character_id
 
 
@@ -136,7 +138,10 @@ def preview_roll() -> dict:
     conn.close()
     species_id = row[0]
     species_name = row[1]
+    #rolls for attributes
     attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
+    #applies modifiers onto attributes if there are any 
+    attributes = apply_species_buffs(species_id, None, "preview", attributes)
     session["pending_roll"] = {
         "species_id": species_id,
         "species": species_name,
@@ -213,11 +218,11 @@ def get_species_buffs(species_id: int) -> dict:
     # Should build a dict in the format of: {"Strength": "2"}
     return {row[0]: row[1] for row in results}
 
-def apply_species_buffs(species_id: int, character_id: int, mode=None):
+def apply_species_buffs(species_id: int, character_id: int, mode=None, attributes=None):
     buffs = get_species_buffs(species_id)
-    conn = sql.connect(db_path)
-    cur = conn.cursor()
     if mode == "insert":
+        conn = sql.connect(db_path)
+        cur = conn.cursor()
         cur.executemany(
         """UPDATE character_attributes SET level= MAX(1, MIN(19, level+?)) WHERE attribute=? AND character_id=?""",
         [(modifier, attribute, character_id) for attribute, modifier in buffs.items()]
@@ -230,18 +235,10 @@ def apply_species_buffs(species_id: int, character_id: int, mode=None):
             conn.close()
             return "human"
     if mode == "preview":
-        cur.execute(
-            """SELECT ca.attribute, ca.level, ca.character_id, c.id, c.species
-                FROM character_attributes ca
-                JOIN ca.character_id = c.id
-            """
-            [(character_id, attribute, modifier) for attribute, modifier in buffs.items()]
-        )
-        rows = cur.fetchall()
-        conn.close()
-        #dict of modified attributes
-        return {rows[0]: row[1] for row in rows}
-    conn.close()
+        for attribute, modifier in buffs.items():
+            if attribute in attributes:
+                attributes[attribute]["level"] = max(1, min(19, attributes[attribute]["level"] + modifier))
+        return attributes
 
 
 def xp_gain():
