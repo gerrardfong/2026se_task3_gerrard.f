@@ -213,11 +213,11 @@ def get_species_buffs(species_id: int) -> dict:
     # Should build a dict in the format of: {"Strength": "2"}
     return {row[0]: row[1] for row in results}
 
-def apply_species_buffs(species_id: int, character_id: int, insert=False, preview=False):
+def apply_species_buffs(species_id: int, character_id: int, mode=None):
     buffs = get_species_buffs(species_id)
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    if insert:
+    if mode == "insert":
         cur.executemany(
         """UPDATE character_attributes SET level= MAX(1, MIN(19, level+?)) WHERE attribute=? AND character_id=?""",
         [(modifier, attribute, character_id) for attribute, modifier in buffs.items()]
@@ -229,15 +229,19 @@ def apply_species_buffs(species_id: int, character_id: int, insert=False, previe
         else:
             conn.close()
             return "human"
-    if preview:
-        cur.executemany(
-            """SELECT attribute, level FROM character_attributes WHERE character_id=? AND species=?""",
-            (character_id, species_id)
+    if mode == "preview":
+        cur.execute(
+            """SELECT ca.attribute, ca.level, ca.character_id, c.id, c.species
+                FROM character_attributes ca
+                JOIN ca.character_id = c.id
+            """
+            [(character_id, attribute, modifier) for attribute, modifier in buffs.items()]
         )
         rows = cur.fetchall()
         conn.close()
         #dict of modified attributes
         return {rows[0]: row[1] for row in rows}
+    conn.close()
 
 
 def xp_gain():
