@@ -83,3 +83,8 @@ Sprint 3 can be for gauntlet.
     - Add xp column to characters
     - Add threshold column to rarities
 - Begin development for species_buffs
+
+11/6/2026
+- Completed species_buffs compartments:
+    - get_species_buffs()
+    - apply_species_buffs()

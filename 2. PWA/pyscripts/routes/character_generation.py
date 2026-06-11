@@ -82,6 +82,7 @@ def insert_character(name: str, species_id: int , attributes: dict, profile_imag
             "INSERT INTO character_attributes (character_id, attribute, level) VALUES (?,?,?)",
             [(character_id, attr, roll["level"]) for attr, roll in attributes.items()],
         )
+        apply_species_buffs(species_id, character_id, True, False)
     conn.commit()
     conn.close()
     return character_id
@@ -212,20 +213,31 @@ def get_species_buffs(species_id: int) -> dict:
     # Should build a dict in the format of: {"Strength": "2"}
     return {row[0]: row[1] for row in results}
 
-def apply_species_buffs(species_id: int, character_id: int) -> str:
+def apply_species_buffs(species_id: int, character_id: int, insert=False, preview=False):
     buffs = get_species_buffs(species_id)
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.executemany(
-        """UPDATE character_attributes SET level=? WHERE attribute=? AND character_id=?""",
-        [(level, attribute, character_id) for attribute, level in buffs.items()]
-    )
-    if cur.rowcount < 1:
+    if insert:
+        cur.executemany(
+        """UPDATE character_attributes SET level= MAX(1, MIN(19, level+?)) WHERE attribute=? AND character_id=?""",
+        [(modifier, attribute, character_id) for attribute, modifier in buffs.items()]
+        )
+        if cur.rowcount > 0:
+            conn.commit()
+            conn.close()
+            return "updated"
+        else:
+            conn.close()
+            return "human"
+    if preview:
+        cur.executemany(
+            """SELECT attribute, level FROM character_attributes WHERE character_id=? AND species=?""",
+            (character_id, species_id)
+        )
+        rows = cur.fetchall()
         conn.close()
-        return "human"
-    conn.commit()
-    conn.close()
-    return "updated"
+        #dict of modified attributes
+        return {rows[0]: row[1] for row in rows}
 
 
 def xp_gain():
