@@ -96,6 +96,7 @@ Sprint 3 can be for gauntlet.
     - Insert_characters() shouldn't require any adjustments since it inserts data
         - I will use AI to validate its functionality.
 - Going to remove AI'D js that is used to operate the character_creation frontend and convert it into pure html anf flask applications
+- The odd structuring of the routes due to "data = request.form" is because I'm too lazy to change all the variable names since I'm moving away from js functionality, so instead of rewriting I'll just change the variable name of "data"
 
 Plan for today:
     - Finish API routes and begin converting frontend from being js reliable into html

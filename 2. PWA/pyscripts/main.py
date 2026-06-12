@@ -77,14 +77,14 @@ def api_roll_preview():
     if not session.get("user_id"):
         return redirect("/index.html")
     result = dbChar.preview_roll()
-    return jsonify(result)
+    return render_template("character_creation.html", result)
 
 
 @app.route("/api/create-character", methods=["POST"])
 def api_create_character():
     if not session.get("user_id"):
         return redirect("/index.html")
-    data = request.get_json(silent=True) or {}
+    data = request.form
     name = data.get("name", "").strip()
     roll = session.pop("pending_roll", None)
     if not name or not roll:
@@ -115,20 +115,19 @@ def api_create_character():
 def api_rename_character():
     if not session.get("user_id"):
         return redirect("/index.html")
-    data = request.get_json(silent=True) or {}
+    data = request.form
     character_id = data.get("character_id")
     new_name = data.get("name", "").strip()
-
     if not character_id or not new_name:
-        return jsonify({"error": "Missing required field"}), 400
+        return render_template("character_creation.html", error="Missing required field"), 400
 
     result = dbChar.rename_character(character_id, new_name)
     if result == "not_found":
-        return jsonify({"error": "Character not found"}), 404
+        return render_template("character_creation.html", error="Character not found"), 404
     if result == "duplicate":
-        return jsonify({"error": "A character already has this name"}), 409
+        return render_template("character_creation.html", error="A character already has this name"), 409
     if result != "success":
-        return jsonify({"error": "Invalid input"}), 400
+        return render_template("character_creation.html", error="Invalid input"), 400
     return jsonify({"name": new_name}), 200
 
 
