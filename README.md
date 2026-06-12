@@ -1,5 +1,6 @@
 # 2026SE_Task3_Gerrard.F
-
+DD/MM/YYYY
+7/6/2026
 Sprint 1:
 Working on the Character Creation section
 
@@ -88,3 +89,15 @@ Sprint 3 can be for gauntlet.
 - Completed species_buffs compartments:
     - get_species_buffs()
     - apply_species_buffs()
+
+12/6/2026
+- Working on implementing API routes for new species_buff functions:
+    - Fix returns from preview_rolls() to return original and modified attributes for user accessibility and readability
+    - Insert_characters() shouldn't require any adjustments since it inserts data
+        - I will use AI to validate its functionality.
+- Going to remove AI'D js that is used to operate the character_creation frontend and convert it into pure html anf flask applications
+
+Plan for today:
+    - Finish API routes and begin converting frontend from being js reliable into html
+        - Implement roll button functionality, finalise button functionality, rename character functionality, delete character functionality
+        - Update API routes to accept POST methods and change the return for each from jsonify into render/redirect

@@ -171,8 +171,6 @@ def api_delete_character():
         return jsonify({"error": "Something went wrong."}), 404
     return jsonify({"character_id": character_id}), 200
 
-@app.route("/api/")
-
 
 @app.route("/gauntlet")
 def gauntlet():

@@ -4,63 +4,59 @@
   <div class="row justify-content-center">
     <div class="col-md-8 my-3"></div>
     <h1 class="display-3 mb-4"><b>Signup to RNSouls</b></h1>
-      <form action="/signup.html" method="POST">
+    <form action="/signup.html" method="POST">
       <hr class="w-100">
       {% if error%}
-        <div
-          class="container alert alert-danger bg-gradient shadow text-center mt-5"
-          role="alert"
-        >
-          <b> {{error}} </b>
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+      <div class="container alert alert-danger bg-gradient shadow text-center mt-5" role="alert">
+        <b> {{error}} </b>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
       {% endif %}
+      <div>
+        <h3><label class="text mt-4 mb-2" for="name">Username</label></h3>
         <div>
-            <h3><label class="text mt-4 mb-2" for="name">Username</label></h3>
-              <div>
-                <required>
-                  <input class="form-control" type="text" id="username" name="username"
-                    placeholder="HotdogBoy_123" pattern="\S{6,30}">
-                  <small class="text">
-                    6-30 characters, Special Characters Allowed: "_" , "!", "-"
-                  </small>
-                </required>
-            </div>
-        </div>
-          <h3><label class="form-group mt-4 mb-2" for="email">Email</label></h3>
-            <required>
-              <input class="form-control" id="email" name="email" pattern="[a-zA-z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-z]+$" placeholder="janedoe@example.com">
-            <small class="text"> This field requires an @ and valid domain </small>
-            </required>
-              </div>
-              <h3><label class="text mt-4 mb-2" for="password">Password</label></h3>
-              <div>
-                <required>
-                  <input class="form-control" type="password" id="password" name="password"
-                    placeholder="Password123!" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[_-*!$?]).{6,30}">
-                  <small class="text">
-                    6-30 characters, Minimum 1 Capital letter, Minimum 1 Special character
-                  </small>
-                </required>
-                <required> 
-                <h3><label class="text mb-2 mt-4" for="confirm_password">Confirm Password</label></h3>
-                    <input class="form-control" type="password" placeholder=" Re-enter password" id="confirm_password" name="confirm_password" >
-                </required>
-                    <div class="form-check my-2">
-                      <input type="checkbox" class="form-check-input show-password-toggle" id="show_password_signup">
-                      <label class="form-check-label" for="show_password_signup">Show Password</label>
-                    <br>
-              <button class="btn btn-dark w-20 my-4" type="submit">Register</button>
-
-              <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
-              <div class="text">Already registered with RNSouls? <a class="text" href="index.html"><u>Login here</u></a></div>
-                </form>
-              </div>  
-            </div>
-          </div>
+          <required>
+            <input class="form-control" type="text" id="username" name="username" placeholder="HotdogBoy_123"
+              pattern="\S{6,30}">
+            <small class="text">
+              6-30 characters, Special Characters Allowed: "_" , "!", "-"
+            </small>
+          </required>
         </div>
       </div>
-    </div>
+      <h3><label class="form-group mt-4 mb-2" for="email">Email</label></h3>
+      <required>
+        <input class="form-control" id="email" name="email" pattern="[a-zA-z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-z]+$"
+          placeholder="janedoe@example.com">
+        <small class="text"> This field requires an @ and valid domain </small>
+      </required>
   </div>
+  <h3><label class="text mt-4 mb-2" for="password">Password</label></h3>
+  <div>
+    <required>
+      <input class="form-control" type="password" id="password" name="password" placeholder="Password123!"
+        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[_-*!$?]).{6,30}">
+      <small class="text">
+        6-30 characters, Minimum 1 Capital letter, Minimum 1 Special character
+      </small>
+    </required>
+    <required>
+      <h3><label class="text mb-2 mt-4" for="confirm_password">Confirm Password</label></h3>
+      <input class="form-control" type="password" placeholder=" Re-enter password" id="confirm_password"
+        name="confirm_password">
+    </required>
+    <br>
+    <button class="btn btn-dark w-20 my-4" type="submit">Register</button>
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="text">Already registered with RNSouls? <a class="text" href="index.html"><u>Login here</u></a></div>
+    </form>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 {% endblock %}

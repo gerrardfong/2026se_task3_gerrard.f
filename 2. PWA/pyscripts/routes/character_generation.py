@@ -139,12 +139,13 @@ def preview_roll() -> dict:
     species_id = row[0]
     species_name = row[1]
     #rolls for attributes
-    attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
+    original_attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
     #applies modifiers onto attributes if there are any 
-    attributes = apply_species_buffs(species_id, None, "preview", attributes)
+    attributes = apply_species_buffs(species_id, None, "preview", original_attributes)
     session["pending_roll"] = {
         "species_id": species_id,
         "species": species_name,
+        "original_attributes": original_attributes,
         "attributes": attributes,
     }
     return session["pending_roll"]
