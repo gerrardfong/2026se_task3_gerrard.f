@@ -114,7 +114,7 @@
   pointer-events: none;
 }
 
-.character-dropdown {
+/* .character-dropdown {
   overflow: hidden;
   transition: all 0.2s ease;
 }
@@ -145,7 +145,7 @@
 
 .character-dropdown[open] .character-dropdown-arrow {
   color: #333;
-}
+} */
 
 .character-dropdown-body {
   animation: dropdown-fade 0.2s ease;
