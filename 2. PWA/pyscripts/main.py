@@ -69,7 +69,7 @@ def character_creation():
     if not session.get("user_id"):
         return redirect("/index.html")
     characters = dbChar.view_characters()
-    return render_template("character_creation.html", characters=characters)
+    return render_template("character_creation2.html", characters=characters)
 
 
 @app.route("/api/roll-preview")

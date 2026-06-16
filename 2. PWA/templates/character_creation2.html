@@ -18,6 +18,8 @@
                     <div class="pfp-preview-wrap">
                       {% if character.profile_image %}
                       <img class="pfp-preview" src="{{ character.profile_image }}" alt="{{ character.name }} profile image">
+                      {% else %}
+                      <span class="pfp-preview-placeholder">No Image</span>
                     </div>
                   </div>
                   <span>Show</span>
