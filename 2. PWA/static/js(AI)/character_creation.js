@@ -313,6 +313,100 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Roll Species & Attributes
+  const rollBtn = document.getElementById("roll-btn");
+  const finaliseBtn = document.getElementById("finalise-btn");
+  const charSpeciesInput = document.getElementById("char-species");
+  const speciesIdInput = document.getElementById("species-id");
+  const modalSpecies = document.getElementById("modal-species");
+  const modalAttributes = document.getElementById("modal-attributes");
+  const rollModalEl = document.getElementById("rollResultModal");
+  const rollModal = rollModalEl ? new bootstrap.Modal(rollModalEl) : null;
+
+  if (rollBtn) {
+    rollBtn.addEventListener("click", function () {
+      const csrfToken = document.getElementById("csrf-token").value;
+      fetch("/api/roll-preview", {
+        headers: { "X-CSRFToken": csrfToken },
+      })
+        .then(function (response) {
+          if (!response.ok) throw new Error("Roll failed");
+          return response.json();
+        })
+        .then(function (data) {
+          if (charSpeciesInput) charSpeciesInput.value = data.species || "";
+          if (speciesIdInput) speciesIdInput.value = data.species_id || "";
+
+          const attrOrder = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"];
+          attrOrder.forEach(function (name) {
+            const el = document.getElementById("attr-" + name);
+            if (!el) return;
+            const entry = data.attributes && data.attributes[name];
+            if (entry) {
+              el.textContent = entry.level + " (" + entry.rarity + ")";
+              el.className = "badge rarity-" + entry.rarity;
+            } else {
+              el.textContent = "-";
+              el.className = "badge bg-secondary";
+            }
+          });
+
+          if (modalSpecies) modalSpecies.textContent = data.species || "";
+          if (modalAttributes) {
+            modalAttributes.innerHTML = "";
+            attrOrder.forEach(function (name) {
+              const entry = data.attributes && data.attributes[name];
+              if (!entry) return;
+              const li = document.createElement("li");
+              li.className = "list-group-item d-flex justify-content-between";
+              li.innerHTML = "<span>" + name + "</span><span class='rarity-" + entry.rarity + "'>" + entry.level + " (" + entry.rarity + ")</span>";
+              modalAttributes.appendChild(li);
+            });
+          }
+
+          if (finaliseBtn) finaliseBtn.disabled = false;
+          if (rollModal) rollModal.show();
+        })
+        .catch(function () {
+          alert("Failed to roll. Please try again.");
+        });
+    });
+  }
+
+  // Finalise Character
+  if (finaliseBtn) {
+    finaliseBtn.addEventListener("click", function () {
+      const name = document.getElementById("char-name") && document.getElementById("char-name").value.trim();
+      if (!name) {
+        alert("Please enter a character name.");
+        return;
+      }
+      const csrfToken = document.getElementById("csrf-token").value;
+      const pfpData = document.getElementById("char-pfp-data") && document.getElementById("char-pfp-data").value;
+      const formData = new FormData();
+      formData.append("csrf_token", csrfToken);
+      formData.append("name", name);
+      if (pfpData) formData.append("pfp", pfpData);
+      fetch("/api/create-character", {
+        method: "POST",
+        body: formData,
+      })
+        .then(function (response) {
+          return response.json().then(function (d) { return { ok: response.ok, data: d }; });
+        })
+        .then(function (result) {
+          if (!result.ok) {
+            alert(result.data.error || "Failed to create character.");
+            return;
+          }
+          window.location.reload();
+        })
+        .catch(function () {
+          alert("Error connecting to server.");
+        });
+    });
+  }
+
   // Handle "Change Photo" file input in the character list
   document.addEventListener("change", function (event) {
     if (!event.target.classList.contains("pfp-edit-input")) return;

@@ -104,4 +104,8 @@ Plan for today:
         - Update API routes to accept POST methods and change the return for each from jsonify into render/redirect
 
 16/6/2026
-- Agent was used to fix pip since the virtual py environment was corrupt
+- Agent:
+    - Used to fix pip since the virtual py environment was corrupt
+    - Added JS for according api routes that required it
+        - edit-pfp
+        - preview-roll

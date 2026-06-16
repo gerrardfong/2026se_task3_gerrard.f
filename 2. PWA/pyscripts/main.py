@@ -77,7 +77,7 @@ def api_roll_preview():
     if not session.get("user_id"):
         return redirect("/index.html")
     result = dbChar.preview_roll()
-    return render_template("character_creation.html", result)
+    return jsonify(result), 200
 
 
 @app.route("/api/create-character", methods=["POST"])
@@ -133,6 +133,8 @@ def api_rename_character():
 
 @app.route("/api/edit-pfp", methods=["POST"])
 def api_edit_pfp():
+    if not session.get("user_id"):
+        return redirect("/index.html")
     data = request.get_json(silent=True) or {}
     character_id = data.get("character_id")
     new_pfp = data.get("profile_image")
