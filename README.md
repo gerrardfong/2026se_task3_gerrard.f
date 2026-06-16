@@ -102,3 +102,6 @@ Plan for today:
     - Finish API routes and begin converting frontend from being js reliable into html
         - Implement roll button functionality, finalise button functionality, rename character functionality, delete character functionality
         - Update API routes to accept POST methods and change the return for each from jsonify into render/redirect
+
+16/6/2026
+- Agent was used to fix pip since the virtual py environment was corrupt

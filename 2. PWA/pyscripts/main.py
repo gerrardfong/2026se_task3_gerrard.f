@@ -69,7 +69,7 @@ def character_creation():
     if not session.get("user_id"):
         return redirect("/index.html")
     characters = dbChar.view_characters()
-    return render_template("character_creation2.html", characters=characters)
+    return render_template("character_creation.html", characters=characters)
 
 
 @app.route("/api/roll-preview")
@@ -128,7 +128,7 @@ def api_rename_character():
         return render_template("character_creation.html", error="A character already has this name"), 409
     if result != "success":
         return render_template("character_creation.html", error="Invalid input"), 400
-    return jsonify({"name": new_name}), 200
+    return redirect("/character-creation")
 
 
 @app.route("/api/edit-pfp", methods=["POST"])

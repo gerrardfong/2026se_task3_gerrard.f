@@ -54,15 +54,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: none;
-}
-
-.pfp-has-image{
-  display: block;
-}
-
-.character-dropdown .pfp-preview{
-  display: block;
 }
 
 .pfp-preview-placeholder {
