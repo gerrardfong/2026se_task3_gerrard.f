@@ -39,6 +39,16 @@
   margin-left: 0.35rem;
 }
 
+.buff-positive {
+  color: green;
+  font-weight: bold;
+}
+
+.buff-negative{
+  color: red;
+  font-weight: bold;
+}
+
 .pfp-preview-wrap {
   width: 76px;
   height: 76px;
