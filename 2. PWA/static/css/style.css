@@ -49,6 +49,11 @@
   font-weight: bold;
 }
 
+.character-list-scroll {
+  max-height: 635px;
+  overflow-y: auto;
+}
+
 .pfp-preview-wrap {
   width: 76px;
   height: 76px;

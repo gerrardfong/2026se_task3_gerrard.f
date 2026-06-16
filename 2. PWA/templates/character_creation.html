@@ -13,6 +13,7 @@
           <h2 class="mb-1">Your Characters</h2>
           <span class="text-muted small mb-3">("Enter" to save new name)</span>
         </div>
+        <div class="character-list-scroll">
         {% if characters %}
         {% for character in characters %}
         <details class="mb-3 border rounded-4">
@@ -94,6 +95,7 @@
         {% else %}
         <div class="border rounded-3 text-muted">No characters yet. Create one!</div>
         {% endif %}
+        </div>
       </div>
     </div>
 
