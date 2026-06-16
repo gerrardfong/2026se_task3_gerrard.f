@@ -95,7 +95,7 @@ def view_characters() -> list:
     conn = sql.connect(db_path)
     cur = conn.cursor()
     cur.execute(
-        """SELECT c.id, c.name, c.profile_image, s.species, ca.attribute, ca.level, r.rarity
+        """SELECT c.id, c.name, c.profile_image, s.species, s.rarity, ca.attribute, ca.level, r.rarity
                 FROM characters c 
                 JOIN species s ON s.id = c.species_id 
                 LEFT JOIN character_attributes ca ON ca.character_id = c.id
@@ -108,12 +108,13 @@ def view_characters() -> list:
 
     grouped = {}
     for row in rows:
-        character_id, name, profile_image, species, attribute, level, rarity = row
+        character_id, name, profile_image, species, species_rarity, attribute, level, rarity = row
         if character_id not in grouped:
             grouped[character_id] = {
                 "id": character_id,
                 "name": name,
                 "species": species,
+                "species_rarity": species_rarity,
                 "profile_image": profile_image,
                 "attributes": [],
             }
