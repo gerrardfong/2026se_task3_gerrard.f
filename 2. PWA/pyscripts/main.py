@@ -69,15 +69,16 @@ def character_creation():
     if not session.get("user_id"):
         return redirect("/index.html")
     characters = dbChar.view_characters()
-    return render_template("character_creation.html", characters=characters)
+    pending_roll = session.get("pending_roll")
+    return render_template("character_creation.html", characters=characters, pending_roll=pending_roll)
 
 
-@app.route("/api/roll-preview")
+@app.route("/api/roll-preview", methods=["POST"])
 def api_roll_preview():
     if not session.get("user_id"):
         return redirect("/index.html")
-    result = dbChar.preview_roll()
-    return jsonify(result), 200
+    dbChar.preview_roll()
+    return redirect("character_creation.html")
 
 
 @app.route("/api/create-character", methods=["POST"])
@@ -88,7 +89,7 @@ def api_create_character():
     name = data.get("name", "").strip()
     roll = session.pop("pending_roll", None)
     if not name or not roll:
-        return jsonify({"error": "Missing required fields"}), 400
+        return redirect("character_creation.html")
     # This is AI, it's just so I can use GIFs
     pfp_data = data.get("pfp", "")
     ALLOWED_PREFIXES = (
@@ -99,17 +100,17 @@ def api_create_character():
     )
     MAX_B64_LEN = 80 * 1024 * 1024
     if pfp_data and not pfp_data.startswith(ALLOWED_PREFIXES):
-        return jsonify({"error": "Invalid image format"}), 400
+        return redirect("character_creation.html")
     if pfp_data and len(pfp_data) > MAX_B64_LEN:
-        return jsonify({"error": "Image too large. Maximum size is 31MB."}), 413
+        return redirect("character_creation.html")
     character_id = dbChar.insert_character(
         name, roll["species_id"], roll["attributes"], pfp_data or None
     )
     # This is AI, it's just so I can use GIFs ^^^^^
     if character_id is None:
-        return jsonify({"error": "A character already has this name"}), 409
-    return jsonify({"character_id": character_id}), 201
-
+        session["pending_roll"] = roll
+        return redirect("character_creation.html")
+    return redirect("character_creation.html")
 
 @app.route("/api/rename-character", methods=["POST"])
 def api_rename_character():
