@@ -137,11 +137,12 @@ def preview_roll() -> dict:
     """Roll a random species and all attributes without persisting to the DB."""
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("SELECT id, species FROM species ORDER BY RANDOM() LIMIT 1")
+    cur.execute("SELECT id, species, rarity FROM species ORDER BY RANDOM() LIMIT 1")
     row = cur.fetchone()
     conn.close()
     species_id = row[0]
     species_name = row[1]
+    species_rarity = row[2]
     #rolls for attributes
     original_attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
     #applies modifiers onto attributes if there are any 
@@ -149,6 +150,7 @@ def preview_roll() -> dict:
     session["pending_roll"] = {
         "species_id": species_id,
         "species": species_name,
+        "species_rarity": species_rarity,
         "original_attributes": original_attributes,
         "attributes": attributes,
     }
@@ -240,9 +242,27 @@ def apply_species_buffs(species_id: int, character_id: int, mode=None, attribute
             conn.close()
             return "human"
     if mode == "preview":
+        conn = sql.connect(db_path)
+        cur = conn.cursor()
         for attribute, modifier in buffs.items():
             if attribute in attributes:
-                attributes[attribute]["level"] = max(1, min(19, attributes[attribute]["rank"] + modifier))
+                cur.execute(
+                    "SELECT rank FROM rarities WHERE level=?", 
+                    (attributes[attribute]["level"],)
+                    )
+                row = cur.fetchone()
+                if row is None:
+                    continue
+                current_rank = row[0]
+                new_rank = max(0, min(18, current_rank + modifier))
+                cur.execute(
+                    "SELECT rank FROM rarities WHERE level=?",
+                    (new_rank, )
+                )
+                new_level = cur.fetchone()
+                if new_level:
+                    attributes[attribute]["level"] = new_level
+        conn.close()
         return attributes
 
 

@@ -70,15 +70,17 @@ def character_creation():
         return redirect("/index.html")
     characters = dbChar.view_characters()
     pending_roll = session.get("pending_roll")
-    return render_template("character_creation.html", characters=characters, pending_roll=pending_roll)
+    return render_template(
+        "character_creation.html", characters=characters, pending_roll=pending_roll
+    )
 
 
 @app.route("/api/roll-preview", methods=["POST"])
 def api_roll_preview():
     if not session.get("user_id"):
         return redirect("/index.html")
-    dbChar.preview_roll()
-    return redirect("character_creation.html")
+    roll = dbChar.preview_roll()
+    return jsonify(roll)
 
 
 @app.route("/api/create-character", methods=["POST"])
@@ -89,7 +91,7 @@ def api_create_character():
     name = data.get("name", "").strip()
     roll = session.pop("pending_roll", None)
     if not name or not roll:
-        return redirect("character_creation.html")
+        return redirect("/character-creation")
     # This is AI, it's just so I can use GIFs
     pfp_data = data.get("pfp", "")
     ALLOWED_PREFIXES = (
@@ -100,17 +102,18 @@ def api_create_character():
     )
     MAX_B64_LEN = 80 * 1024 * 1024
     if pfp_data and not pfp_data.startswith(ALLOWED_PREFIXES):
-        return redirect("character_creation.html")
+        return redirect("/character-creation")
     if pfp_data and len(pfp_data) > MAX_B64_LEN:
-        return redirect("character_creation.html")
+        return redirect("/character-creation")
     character_id = dbChar.insert_character(
         name, roll["species_id"], roll["attributes"], pfp_data or None
     )
     # This is AI, it's just so I can use GIFs ^^^^^
     if character_id is None:
         session["pending_roll"] = roll
-        return redirect("character_creation.html")
-    return redirect("character_creation.html")
+        return redirect("/character-creation")
+    return redirect("/character-creation")
+
 
 @app.route("/api/rename-character", methods=["POST"])
 def api_rename_character():
@@ -120,13 +123,24 @@ def api_rename_character():
     character_id = data.get("character_id")
     new_name = data.get("name", "").strip()
     if not character_id or not new_name:
-        return render_template("character_creation.html", error="Missing required field"), 400
+        return (
+            render_template("character_creation.html", error="Missing required field"),
+            400,
+        )
 
     result = dbChar.rename_character(character_id, new_name)
     if result == "not_found":
-        return render_template("character_creation.html", error="Character not found"), 404
+        return (
+            render_template("character_creation.html", error="Character not found"),
+            404,
+        )
     if result == "duplicate":
-        return render_template("character_creation.html", error="A character already has this name"), 409
+        return (
+            render_template(
+                "character_creation.html", error="A character already has this name"
+            ),
+            409,
+        )
     if result != "success":
         return render_template("character_creation.html", error="Invalid input"), 400
     return redirect("/character-creation")

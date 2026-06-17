@@ -324,52 +324,48 @@ document.addEventListener("DOMContentLoaded", function () {
   const rollModal = rollModalEl ? new bootstrap.Modal(rollModalEl) : null;
 
   if (rollBtn) {
-    rollBtn.addEventListener("click", function () {
-      const csrfToken = document.getElementById("csrf-token").value;
-      fetch("/api/roll-preview", {
-        headers: { "X-CSRFToken": csrfToken },
-      })
-        .then(function (response) {
-          if (!response.ok) throw new Error("Roll failed");
-          return response.json();
-        })
-        .then(function (data) {
-          if (charSpeciesInput) charSpeciesInput.value = data.species || "";
-          if (speciesIdInput) speciesIdInput.value = data.species_id || "";
+    rollBtn.addEventListener("click", async () => {
+      const res = await fetch("/api/roll-preview", {
+        method: "POST",
+        headers: { "X-CSRFToken": document.querySelector('meta[name="csrf-token"]').content },
+      });
+      const roll = await res.json();
 
-          const attrOrder = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"];
-          attrOrder.forEach(function (name) {
-            const el = document.getElementById("attr-" + name);
-            if (!el) return;
-            const entry = data.attributes && data.attributes[name];
-            if (entry) {
-              el.textContent = entry.level + " (" + entry.rarity + ")";
-              el.className = "badge rarity-" + entry.rarity;
-            } else {
-              el.textContent = "-";
-              el.className = "badge bg-secondary";
-            }
-          });
+      // Build the preview HTML
+      const attrOrder = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"];
+      let listItems = "";
+      for (const name of attrOrder) {
+        if (roll.attributes[name]) {
+          const r = roll.attributes[name];
+          listItems += `
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>${name}</span>
+            <span>
+              <span class="fw-bold">${r.level}</span>
+              <span class="rarity-${r.rarity}">(${r.rarity})</span>
+            </span>
+          </li>`;
+        }
+      }
 
-          if (modalSpecies) modalSpecies.textContent = data.species || "";
-          if (modalAttributes) {
-            modalAttributes.innerHTML = "";
-            attrOrder.forEach(function (name) {
-              const entry = data.attributes && data.attributes[name];
-              if (!entry) return;
-              const li = document.createElement("li");
-              li.className = "list-group-item d-flex justify-content-between";
-              li.innerHTML = "<span>" + name + "</span><span class='rarity-" + entry.rarity + "'>" + entry.level + " (" + entry.rarity + ")</span>";
-              modalAttributes.appendChild(li);
-            });
-          }
+      const html = `
+      <div class="text-center">
+        <span class="border rounded-3 px-2 py-2">Species:
+          <span class="fw-bold rarity-${roll.species_rarity}">${roll.species}</span>
+        </span>
+      </div>
+      <ul class="list-group mt-3">${listItems}</ul>`;
 
-          if (finaliseBtn) finaliseBtn.disabled = false;
-          if (rollModal) rollModal.show();
-        })
-        .catch(function () {
-          alert("Failed to roll. Please try again.");
-        });
+      // Insert or replace the preview box
+      let preview = document.getElementById("roll-preview");
+      if (!preview) {
+        preview = document.createElement("div");
+        preview.id = "roll-preview";
+        preview.className = "border rounded-3 p-3 mt-2";
+        // Insert before the buttons container
+        rollBtn.closest(".d-flex").before(preview);
+      }
+      preview.innerHTML = html;
     });
   }
 
