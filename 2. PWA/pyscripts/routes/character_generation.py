@@ -73,8 +73,8 @@ def insert_character(name: str, species_id: int , attributes: dict, profile_imag
         conn.close()
         return None
     cur.execute(
-        "INSERT INTO characters (name, species_id, user_id, profile_image) VALUES (?, ?, ?, ?)",
-        (name, species_id, user_id, profile_image),
+        "INSERT INTO characters (name, species_id, user_id, profile_image, xp) VALUES (?, ?, ?, ?, ?)",
+        (name, species_id, user_id, profile_image, 0),
     )
     character_id = cur.lastrowid
     if attributes:
@@ -95,7 +95,7 @@ def view_characters() -> list:
     conn = sql.connect(db_path)
     cur = conn.cursor()
     cur.execute(
-        """SELECT c.id, c.name, c.profile_image, c.species_id, s.species, s.rarity, ca.attribute, ca.level, r.rarity
+        """SELECT c.id, c.name, c.profile_image, c.species_id, c.xp, s.species, s.rarity, ca.attribute, ca.level, r.rarity
                 FROM characters c 
                 JOIN species s ON s.id = c.species_id 
                 LEFT JOIN character_attributes ca ON ca.character_id = c.id
@@ -108,7 +108,7 @@ def view_characters() -> list:
 
     grouped = {}
     for row in rows:
-        character_id, name, profile_image, species_id, species, species_rarity, attribute, level, rarity = row
+        character_id, name, profile_image, species_id, xp, species, species_rarity, attribute, level, rarity = row
         buffs = get_species_buffs(species_id)
         if character_id not in grouped:
             grouped[character_id] = {
@@ -118,6 +118,7 @@ def view_characters() -> list:
                 "species_rarity": species_rarity,
                 "profile_image": profile_image,
                 "buffs": buffs,
+                "xp": xp,
                 "attributes": [],
             }
 
@@ -245,7 +246,7 @@ def apply_species_buffs(species_id: int, character_id: int, mode=None, attribute
         return attributes
 
 
-def xp_gain():
+def xp_gain(enemy: dict):
     pass
 
 def levelup_attribute():

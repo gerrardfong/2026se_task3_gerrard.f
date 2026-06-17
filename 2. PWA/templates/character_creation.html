@@ -35,9 +35,12 @@
                     <span class="input-group-text">✏️</span>
                   </div>
                 </form>
-                <span
-                  class="fw-bold border rounded-3 rarity-{{ character.species_rarity }} small px-2 py-1 align-self-start">{{
-                  character.species}}</span>
+                <div class="d-flex align-items-center gap-2">
+                  <span
+                    class="fw-bold border rounded-3 rarity-{{ character.species_rarity }} small px-2 py-1 align-self-start">{{
+                    character.species}}</span>
+                  <span class="border rounded-3 align-self-start px-2 py-1 small">XP: {{ character.xp }}</span>
+                </div>
               </div>
             </div>
             <span> Show ⬇️</span>
