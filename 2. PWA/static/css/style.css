@@ -55,8 +55,8 @@
 }
 
 .pfp-preview-wrap {
-  width: 76px;
-  height: 76px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   border: 2px solid #d3d3d3;
   overflow: hidden;

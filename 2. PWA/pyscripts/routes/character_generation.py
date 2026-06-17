@@ -221,7 +221,7 @@ def get_species_buffs(species_id: int) -> dict:
     results = cur.fetchall()
     conn.close()
     # Should build a dict in the format of: {"Strength": "2"}
-    return {row[0]: row[1] for row in results}
+    return {row[0]: int(row[1]) for row in results}
 
 def apply_species_buffs(species_id: int, character_id: int, mode=None, attributes=None):
     buffs = get_species_buffs(species_id)
@@ -242,7 +242,7 @@ def apply_species_buffs(species_id: int, character_id: int, mode=None, attribute
     if mode == "preview":
         for attribute, modifier in buffs.items():
             if attribute in attributes:
-                attributes[attribute]["level"] = max(1, min(19, attributes[attribute]["level"] + modifier))
+                attributes[attribute]["level"] = max(1, min(19, attributes[attribute]["rank"] + modifier))
         return attributes
 
 

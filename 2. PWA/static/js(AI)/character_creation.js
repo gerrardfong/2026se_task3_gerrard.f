@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const pfpCropImage = document.getElementById("pfp-crop-image");
   const pfpCropConfirm = document.getElementById("pfp-crop-confirm");
   const pfpZoom = document.getElementById("pfp-zoom");
-  if (!pfpInput && !pfpCropStage) return;
+  if (!pfpInput && !pfpCropStage && !document.getElementById("create-pfp-input")) return;
 
   let editingCharacterId = null;
   let editingPfpImgEl = null;
@@ -413,10 +413,62 @@ document.addEventListener("DOMContentLoaded", function () {
     const file = event.target.files && event.target.files[0];
     const label = event.target.closest("[data-character-id]");
     if (!file || !label) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Please choose an image file.");
+      return;
+    }
     editingCharacterId = label.dataset.characterId;
     editingPfpImgEl = label.closest("details").querySelector(".pfp-preview");
-    openCropModalFromFile(file);
+
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var csrfToken = document.querySelector('input[name="csrf_token"]').value;
+      fetch("/api/edit-pfp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+        body: JSON.stringify({ character_id: Number(editingCharacterId), profile_image: e.target.result }),
+      }).then(function (response) {
+        if (!response.ok) {
+          return response.json().then(function (d) { alert(d.error || "Failed to update photo."); });
+        }
+        if (editingPfpImgEl) {
+          editingPfpImgEl.src = e.target.result;
+          editingPfpImgEl.classList.remove("d-none");
+          var wrap = editingPfpImgEl.closest(".pfp-preview-wrap");
+          if (wrap) {
+            var placeholder = wrap.querySelector(".pfp-preview-placeholder");
+            if (placeholder) placeholder.classList.add("d-none");
+          }
+        }
+        editingCharacterId = null;
+        editingPfpImgEl = null;
+      }).catch(function () {
+        alert("Error connecting to server.");
+        editingCharacterId = null;
+        editingPfpImgEl = null;
+      });
+    };
+    reader.readAsDataURL(file);
     event.target.value = "";
   });
+
+  // Create character PFP preview
+  const createPfpInput = document.getElementById("create-pfp-input");
+  const createPfpPreview = document.getElementById("create-pfp-preview");
+  const createPfpPlaceholder = document.getElementById("create-pfp-placeholder");
+
+  if (createPfpInput) {
+    createPfpInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (!file || !file.type.startsWith("image/")) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        createPfpPreview.src = e.target.result;
+        createPfpPreview.classList.remove("d-none");
+        createPfpPlaceholder.classList.add("d-none");
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
 });

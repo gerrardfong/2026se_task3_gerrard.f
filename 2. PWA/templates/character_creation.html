@@ -105,14 +105,40 @@
     <!-- Right box: character creation form -->
     <div class="col-12 col-md-6">
       <div class="border border-2 rounded-4 p-4 bg-white">
-        <h2 class="h5 mb-3">Create a Character</h2>
-        <form method="POST" action="/api/roll-preview">
-          
+        <h2 class="mb-3">Create a Character</h2>
+        <form id="create-character" methods="POST" action="/api/create-character">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="text" class="border rounded-3 form-control" placeholder="Enter character name" required>
+          <div class="d-flex align-items-center gap-2 mt-2">
+            <input type="file" name="pfp" id="create-pfp-input" class="form-control" accpet="image/*">
+            <div class="pfp-preview-wrap">
+              <img id="create-pfp-preview" class="pfp-preview">
+              <span id="create-pfp-placeholder" class="pfp-preview-placeholder">No Image</span>
+            </div>  
+          </div>
         </form>
 
-        <form>
+        {% if pending_roll %}
+        <div class="border rounded-3 p-3 mt-2">
+          <h6>Species: <span class="fw-bold">{{ pending_roll.species }}</span></h6>
+          <ul class="list-group">
+            {% for attr, roll in pending_roll.attributes.items() %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>{{ attr }}</span>
+              <span class="fw-bold">{{ roll.level }} <span class="text-muted">({{ roll.rarity }})</span></span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
 
-        </form>
+        <div class="d-flex flex-column mt-2">
+          <form method="POST" action="/api/roll-preview">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-secondary w-100">Roll Species & Attributes</button>
+          </form>
+        <button type="submit" form="create-character" class="btn btn-success w-100 my-2">Finalise Character</button>
+        </div>
       </div>
     </div>
 {% endblock %}
