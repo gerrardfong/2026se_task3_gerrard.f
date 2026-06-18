@@ -50,25 +50,25 @@
               <ul class="list-group border rounded-3">
                 {% if character.attributes %}
                 {% set attr_order = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"] %}
-                {% for name in attr_order %}
-                {% for attr in character.attributes if attr.attribute == name%}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>{{ attr.attribute }}</span>
-                  <span>
-                    {% set modifier = character.buffs.get(attr.attribute) %}
-                    {% if modifier %}
-                    {% if modifier > 0 %}
-                    <span class="buff-positive">( +{{ modifier }} )</span>
-                    {% else %}
-                    <span class="buff-negative">( {{ modifier }} )</span>
-                    {% endif %}
-                    {% endif %}
-                    <span class="fw-bold">{{ attr.level }}</span>
-                    <span class="fw-bold rarity-{{ attr.rarity}}">({{ attr.rarity }})</span>
-                  </span>
-                </li>
-                {% endfor %}
-                {% endfor %}
+                  {% for name in attr_order %}
+                    {% for attr in character.attributes if attr.attribute == name%}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>{{ attr.attribute }}</span>
+                      <span>
+                        {% set modifier = character.buffs.get(attr.attribute) %}
+                        {% if modifier %}
+                          {% if modifier > 0 %}
+                          <span class="buff-positive">( +{{ modifier }} )</span>
+                          {% else %}
+                          <span class="buff-negative">( {{ modifier }} )</span>
+                          {% endif %}
+                        {% endif %}
+                        <span class="fw-bold">{{ attr.level }}</span>
+                        <span class="fw-bold rarity-{{ attr.rarity}}">({{ attr.rarity }})</span>
+                      </span>
+                    </li>
+                    {% endfor %}
+                  {% endfor %}
                 {% else %}
                 <span class="border rounded-3 text-muted">No attributes found.</span>
                 {% endif %}
@@ -120,11 +120,12 @@
           </div>
         </form>
 
-        
+
         <div id="roll-preview" class="border rounded-3 p-3 mt-2">
           <div class="text-center">
             <span class="border rounded-3 px-2 py-2">Species:
-              <span class="fw-bold {% if pending_roll %} rarity-{{ pending_roll.species_rarity }} {% endif %}">{{ pending_roll.species if pending_roll else "-" }}</span>
+              <span class="fw-bold {% if pending_roll %} rarity-{{ pending_roll.species_rarity }} {% endif %}">{{
+                pending_roll.species if pending_roll else "-" }}</span>
             </span>
           </div>
           <ul class="list-group mt-3">
@@ -132,33 +133,65 @@
             {% if pending_roll %}
               {% for name in attr_order %}
                 {% for attr, roll in pending_roll.attributes.items() if attr==name %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>{{ attr }}</span>
-                  <span class="fw-bold">{{ roll.level }} <span class="fw-bold rarity-{{ roll.rarity }} ">({{
-                      roll.rarity}})</span></span>
-                </li>
-                {% endfor %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{ attr }}</span>
+                    <span class="d-flex align-items-center gap-1">
+                      {% set modifier = pending_roll.buffs.get(attr) %}
+                      {% if modifier %}
+                        {% if modifier > 0 %}
+                        <span class="buff-positive">( +{{ modifier }} )</span>
+                        {% else %}
+                        <span class="buff-negative">( {{ modifier }} )</span>
+                        {% endif %}
+                      {% endif %}
+                      <span class="fw-bold">{{ roll.level }}</span>
+                      <span class="fw-bold rarity-{{ roll.rarity }}">({{ roll.rarity }})</span>
+                    </span>
+                  </li>
               {% endfor %}
+            {% endfor %}
             {% else %}
               {% for name in attr_order %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>{{ name }}</span>
-                  <span class="fw-bold"> - </span>
-                </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ name }}</span>
+                <span class="fw-bold"> - </span>
+              </li>
               {% endfor %}
             {% endif %}
           </ul>
         </div>
-      
 
         <div class="d-flex flex-column mt-2">
-          <button id="roll-btn" class="btn btn-secondary w-100">Roll Species & Attributes</button>
-          <button type="submit" form="create-character" class="btn btn-success w-100 my-2">Finalise Character</button>
+          <button id="toggle-modal-btn" class="btn btn-outline-success w-100 my-1">Auto-Show Original Rolls:
+            ON</button>
+          <button id="roll-btn" class="btn btn-secondary w-100 my-1">Roll Species & Attributes</button>
+          <button id="view-original-btn" class="btn btn-outline-secondary w-100 my-1 d-none" data-bs-toggle="modal"
+            data-bs-target="#originalRollModal">
+            View Original Rolls
+          </button>
+          <button type="submit" form="create-character" class="btn btn-success w-100 my-1">Finalise Character</button>
         </div>
       </div>
     </div>
-    {% endblock %}
+  </div>
+</div>
 
-    {% block scripts %}
-    <script src="/static/js(AI)/character_creation.js"></script>
-    {% endblock %}
+<div class="modal fade" id="originalRollModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Original Roll</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="original-roll-species" class="text-center mb-3"></div>
+        <ul class="list-group" id="original-roll-attributes"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js(AI)/character_creation.js"></script>
+{% endblock %}

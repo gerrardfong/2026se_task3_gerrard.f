@@ -323,6 +323,17 @@ document.addEventListener("DOMContentLoaded", function () {
   const rollModalEl = document.getElementById("rollResultModal");
   const rollModal = rollModalEl ? new bootstrap.Modal(rollModalEl) : null;
 
+  let autoShowOriginal = true;
+  const toggleModalBtn = document.getElementById("toggle-modal-btn");
+  if (toggleModalBtn) {
+    toggleModalBtn.addEventListener("click", () => {
+      autoShowOriginal = !autoShowOriginal;
+      toggleModalBtn.textContent = `Auto-Show Original Rolls: ${autoShowOriginal ? "ON" : "OFF"}`;
+      toggleModalBtn.classList.toggle("btn-outline-secondary", autoShowOriginal);
+      toggleModalBtn.classList.toggle("btn-outline-danger", !autoShowOriginal);
+    });
+  }
+
   if (rollBtn) {
     rollBtn.addEventListener("click", async () => {
       const res = await fetch("/api/roll-preview", {
@@ -337,10 +348,18 @@ document.addEventListener("DOMContentLoaded", function () {
       for (const name of attrOrder) {
         if (roll.attributes[name]) {
           const r = roll.attributes[name];
+          const modifier = roll.buffs ? roll.buffs[name] : null;
+          let buffHtml = "";
+          if (modifier) {
+            buffHtml = modifier > 0
+              ? `<span class="buff-positive">( +${modifier} )</span>`
+              : `<span class="buff-negative">( ${modifier} )</span>`;
+          }
           listItems += `
           <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>${name}</span>
             <span>
+              ${buffHtml}
               <span class="fw-bold">${r.level}</span>
               <span class="fw-bold rarity-${r.rarity}">(${r.rarity})</span>
             </span>
@@ -362,10 +381,42 @@ document.addEventListener("DOMContentLoaded", function () {
         preview = document.createElement("div");
         preview.id = "roll-preview";
         preview.className = "border rounded-3 p-3 mt-2";
-        // Insert before the buttons container
         rollBtn.closest(".d-flex").before(preview);
       }
       preview.innerHTML = html;
+
+      // Populate original roll modal
+      const origSpeciesEl = document.getElementById("original-roll-species");
+      const origAttrsEl = document.getElementById("original-roll-attributes");
+      const viewOrigBtn = document.getElementById("view-original-btn");
+      if (origSpeciesEl && origAttrsEl) {
+        origSpeciesEl.innerHTML = `
+          <span class="border rounded-3 px-2 py-2">Species:
+            <span class="fw-bold rarity-${roll.species_rarity}">${roll.species}</span>
+          </span>`;
+        let origItems = "";
+        for (const name of attrOrder) {
+          if (roll.original_attributes[name]) {
+            const r = roll.original_attributes[name];
+            origItems += `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>${name}</span>
+              <span>
+                <span class="fw-bold">${r.level}</span>
+                <span class="fw-bold rarity-${r.rarity}">(${r.rarity})</span>
+              </span>
+            </li>`;
+          }
+        }
+        origAttrsEl.innerHTML = origItems;
+      }
+      if (viewOrigBtn) {
+        viewOrigBtn.classList.remove("d-none");
+      }
+      if (autoShowOriginal) {
+        const origModalEl = document.getElementById("originalRollModal");
+        if (origModalEl) bootstrap.Modal.getOrCreateInstance(origModalEl).show();
+      }
     });
   }
 

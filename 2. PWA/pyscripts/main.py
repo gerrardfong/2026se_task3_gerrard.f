@@ -7,7 +7,8 @@ from routes import character_generation as dbChar
 
 app = Flask(__name__, template_folder="../templates", static_folder="../static")
 app.secret_key = os.urandom(24)
-app.config["MAX_CONTENT_LENGTH"] = 80 * 1024 * 1024  # 80MB max upload
+app.config["MAX_CONTENT_LENGTH"] = 80 * 1024 * 1024
+app.config["MAX_FORM_MEMORY_SIZE"] = 80 * 1024 * 1024
 csrf = CSRFProtect(app)
 
 
@@ -83,6 +84,7 @@ def api_roll_preview():
     return jsonify(roll)
 
 
+
 @app.route("/api/create-character", methods=["POST"])
 def api_create_character():
     if not session.get("user_id"):
@@ -92,7 +94,6 @@ def api_create_character():
     roll = session.pop("pending_roll", None)
     if not name or not roll:
         return redirect("/character-creation")
-    # This is AI, it's just so I can use GIFs
     pfp_data = data.get("pfp", "")
     ALLOWED_PREFIXES = (
         "data:image/png;",
@@ -108,7 +109,6 @@ def api_create_character():
     character_id = dbChar.insert_character(
         name, roll["species_id"], roll["attributes"], pfp_data or None
     )
-    # This is AI, it's just so I can use GIFs ^^^^^
     if character_id is None:
         session["pending_roll"] = roll
         return redirect("/character-creation")
@@ -127,7 +127,6 @@ def api_rename_character():
             render_template("character_creation.html", error="Missing required field"),
             400,
         )
-
     result = dbChar.rename_character(character_id, new_name)
     if result == "not_found":
         return (
@@ -153,7 +152,6 @@ def api_edit_pfp():
     data = request.get_json(silent=True) or {}
     character_id = data.get("character_id")
     new_pfp = data.get("profile_image")
-    # This is AI, it's just so I can use GIFs
     if not character_id or not new_pfp:
         return jsonify({"error": "Missing required fields"}), 400
     ALLOWED_PREFIXES = (
@@ -167,7 +165,6 @@ def api_edit_pfp():
         return jsonify({"error": "Invalid image format"}), 400
     if len(new_pfp) > MAX_B64_LEN:
         return jsonify({"error": "Image too large. Maximum size is 31MB."}), 413
-    # This is AI, it's just so I can use GIFs ^^^^^
     result = dbChar.edit_pfp(new_pfp, character_id)
     if result != "success":
         return jsonify({"error": "Something went wrong"}), 400
@@ -178,14 +175,14 @@ def api_edit_pfp():
 def api_delete_character():
     if not session.get("user_id"):
         return redirect("/index.html")
-    data = request.get_json(silent=True) or {}
+    data = request.form
     character_id = data.get("character_id")
     if not character_id:
-        return jsonify({"error": "Invalid character"}), 400
+        return render_template("character_creation.html", error="Invalid character"), 400
     result = dbChar.delete_character(character_id)
     if result != "success":
-        return jsonify({"error": "Something went wrong."}), 404
-    return jsonify({"character_id": character_id}), 200
+        return render_template("character_creation.html", error="Something went wrong."), 404
+    return redirect("/character-creation")
 
 
 @app.route("/gauntlet")

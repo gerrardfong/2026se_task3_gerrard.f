@@ -109,3 +109,15 @@ Plan for today:
     - Added JS for according api routes that required it
         - edit-pfp
         - preview-roll
+
+18/6/2026
+- Based off of past goals the aim of this sprint has changed slightly
+- Used Agent to add JS for roll-preview and modal pop-up
+- This sprint will most likely be targetted at:
+    - implementing species_buffs
+    - xp thresholds
+    - adding the prompt in the case that I want to change the rarities
+    - finishing enemy character generation since I've already started it 
+    - (added) implement modals/pop-ups that prevent users from roll past high-rarity rolls
+    - (added) add a toggle button that disables pop-ups and what rarities can be skipped\
+

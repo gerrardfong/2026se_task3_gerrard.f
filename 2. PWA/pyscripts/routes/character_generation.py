@@ -86,7 +86,7 @@ def insert_character(name: str, species_id: int , attributes: dict, profile_imag
     conn.close()
     #condition added to make function look tidier 
     if attributes:
-        apply_species_buffs(species_id, character_id, "insert")
+        apply_species_buffs(species_id, character_id, "insert", attributes)
     return character_id
 
 
@@ -147,12 +147,14 @@ def preview_roll() -> dict:
     original_attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
     #applies modifiers onto attributes if there are any 
     attributes = apply_species_buffs(species_id, None, "preview", original_attributes)
+    buffs = get_species_buffs(species_id)
     session["pending_roll"] = {
         "species_id": species_id,
         "species": species_name,
         "species_rarity": species_rarity,
         "original_attributes": original_attributes,
         "attributes": attributes,
+        "buffs": buffs,
     }
     return session["pending_roll"]
 
@@ -238,15 +240,16 @@ def apply_species_buffs(species_id: int, character_id: int, mode=None, attribute
                 "SELECT rank FROM rarities WHERE level=?", (attributes[attribute]["level"],)
             )
             rank = cur.fetchone()
+            new_rank = max(1, min(19, rank[0] + modifier))
             cur.execute(
-                "SELECT level FROM rarities WHERE rank = ?", (rank[0] + modifier,)
+                "SELECT level FROM rarities WHERE rank = ?", (new_rank,)
             )
             new_level = cur.fetchone()
             if new_level:
                 cur.execute(
-                    "UPDATE characters SET level=? WHERE character_id=? AND attribute=?", (new_level, character_id, attribute[attribute])
+                    "UPDATE character_attributes SET level=? WHERE character_id=? AND attribute=?", (new_level[0], character_id, attribute)
                 )
-                if cur.rowcount > 1:
+                if cur.rowcount > 0:
                     updated = True
             if updated:
                 conn.commit()
