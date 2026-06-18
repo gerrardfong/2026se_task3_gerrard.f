@@ -34,6 +34,7 @@ RANDOM_PFP = [
 
 ENEMY_TIER_WEIGHTS = {
     "Easy": dbChar.RARITY_WEIGHTS,
+    
     "Intermediate": {
     "Common": 30,
     "Uncommon": 30,
@@ -78,6 +79,9 @@ def get_name() -> str:
 
 def get_pfp() -> str:
     return random.choice(RANDOM_PFP)
+
+def get_tier():
+    pass
 
 
 def create_enemy() -> dict:

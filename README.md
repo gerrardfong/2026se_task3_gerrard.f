@@ -119,5 +119,5 @@ Plan for today:
     - adding the prompt in the case that I want to change the rarities
     - finishing enemy character generation since I've already started it 
     - (added) implement modals/pop-ups that prevent users from roll past high-rarity rolls
-    - (added) add a toggle button that disables pop-ups and what rarities can be skipped\
+    - (added) add a toggle button that disables pop-ups and what rarities can be skipped
 
