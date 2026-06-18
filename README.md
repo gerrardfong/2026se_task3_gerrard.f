@@ -16,12 +16,11 @@ Working on the Character Creation section
 Sprint 2:
 Working on Gauntlet gamemode where players will be able to use their character in action
 
-- Plan:
+- Old Plan:
     - Quality of Life features: 
         - Add a report/feedback button in footer since the app is able to be accessed by users as long as flask is running
         - Add a common theme and update CSS for all pages including signup and login, so it's aesthetically appeasing
         - Optimise layout for Mobile users as well
-
 
     - Build the gauntlet:
         - Compromises of different levels that will have randomly generated enemy attributes and characteristics
@@ -30,10 +29,39 @@ Working on Gauntlet gamemode where players will be able to use their character i
         - Player can select a character they want to put into gauntlet
         - Universal leaderboard that all players can see for competitiveness
 
+- New Plan:
+    - implementing species_buffs
+    - xp thresholds
+    - adding the prompt in the case that I want to change the rarities
+    - finishing enemy character generation since I've already started it 
+    - (added) implement modals/pop-ups that prevent users from roll past high-rarity rolls
+    - (added) add a toggle button that disables pop-ups and what rarities can be skipped
+
 Sprint 3:
+- Old Plan:
+    - Implement Player vs Player
+    - Add Offline mode and Quality of life features
+
+- Plan: 
+    - Quality of Life features: 
+        - Add a report/feedback button in footer since the app is able to be accessed by users as long as flask is running
+        - Add a common theme and update CSS for all pages including signup and login, so it's aesthetically appeasing
+        - Optimise layout for Mobile users as well
+
+    - Build the gauntlet:
+        - Compromises of different levels that will have randomly generated enemy attributes and characteristics
+        - Add a random generator that creates enemies and randomises their statistics
+        - Ensure that there is some sort of battle UI or animation which will most likely be imported off of free assets, so it's more entertaining/engaging
+        - Player can select a character they want to put into gauntlet
+        - Universal leaderboard that all players can see for competitiveness
+
+
+Sprint 4:
 - Plan:
     - Implement Player vs Player
     - Add Offline mode and Quality of life features
+
+
 
 Development Log:
 8/6/2026
