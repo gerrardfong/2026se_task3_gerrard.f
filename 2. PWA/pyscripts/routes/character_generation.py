@@ -230,17 +230,29 @@ def apply_species_buffs(species_id: int, character_id: int, mode=None, attribute
     if mode == "insert":
         conn = sql.connect(db_path)
         cur = conn.cursor()
-        cur.executemany(
-        """UPDATE character_attributes SET level= MAX(1, MIN(19, level+?)) WHERE attribute=? AND character_id=?""",
-        [(modifier, attribute, character_id) for attribute, modifier in buffs.items()]
-        )
-        if cur.rowcount > 0:
-            conn.commit()
-            conn.close()
-            return "updated"
-        else:
-            conn.close()
-            return "human"
+        updated = False
+        for attribute, modifier in buffs.items():
+            if modifier == 0:
+                continue
+            cur.execute(
+                "SELECT rank FROM rarities WHERE level=?", (attributes[attribute]["level"],)
+            )
+            rank = cur.fetchone()
+            cur.execute(
+                "SELECT level FROM rarities WHERE rank = ?", (rank[0] + modifier,)
+            )
+            new_level = cur.fetchone()
+            if new_level:
+                cur.execute(
+                    "UPDATE characters SET level=? WHERE character_id=? AND attribute=?", (new_level, character_id, attribute[attribute])
+                )
+                if cur.rowcount > 1:
+                    updated = True
+            if updated:
+                conn.commit()
+        conn.close()
+        return "updated" if updated else "human"
+                
     if mode == "preview":
         conn = sql.connect(db_path)
         cur = conn.cursor()
@@ -256,12 +268,12 @@ def apply_species_buffs(species_id: int, character_id: int, mode=None, attribute
                 current_rank = row[0]
                 new_rank = max(0, min(18, current_rank + modifier))
                 cur.execute(
-                    "SELECT rank FROM rarities WHERE level=?",
+                    "SELECT level FROM rarities WHERE rank=?",
                     (new_rank, )
                 )
                 new_level = cur.fetchone()
                 if new_level:
-                    attributes[attribute]["level"] = new_level
+                    attributes[attribute]["level"] = new_level[0]
         conn.close()
         return attributes
 
