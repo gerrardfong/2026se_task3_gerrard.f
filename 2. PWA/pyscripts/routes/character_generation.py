@@ -279,6 +279,31 @@ def apply_species_buffs(species_id: int, character_id: int, mode=None, attribute
                     attributes[attribute]["level"] = new_level[0]
         conn.close()
         return attributes
+    
+    if mode == "enemy":
+        conn = sql.connect(db_path)
+        cur = conn.cursor()
+        for attribute, modifier in buffs.items():
+            if attribute in attributes:
+                cur.execute(
+                    "SELECT rank FROM rarities WHERE level=?", 
+                    (attributes[attribute]["level"],)
+                    )
+                row = cur.fetchone()
+                if row is None:
+                    continue
+                current_rank = row[0]
+                new_rank = max(0, min(18, current_rank + modifier))
+                cur.execute(
+                    "SELECT level FROM rarities WHERE rank=?",
+                    (new_rank, )
+                )
+                new_level = cur.fetchone()
+                if new_level:
+                    attributes[attribute]["level"] = new_level[0]
+        conn.close()
+        return attributes
+
 
 
 def xp_gain(enemy: dict):

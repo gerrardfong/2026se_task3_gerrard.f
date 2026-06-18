@@ -33,6 +33,7 @@ RANDOM_PFP = [
 ]
 
 ENEMY_TIER_WEIGHTS = {
+    
     "Easy": dbChar.RARITY_WEIGHTS,
     
     "Intermediate": {
@@ -89,7 +90,7 @@ def get_tier():
     )[0]
     return tier
 
-def rarity_generation(tier = None) -> dict:
+def rarity_generation(tier="Easy") -> dict:
     rarity = random.choices(
         population=list(ENEMY_TIER_WEIGHTS[tier].keys()),
         weights=list(ENEMY_TIER_WEIGHTS[tier].values()),
@@ -104,18 +105,36 @@ def rarity_generation(tier = None) -> dict:
     conn.close()
     return {"rarity": rarity, "level": row[0]}
 
+def roll_species() -> tuple:
+    rarity = dbChar.rarity_generation()
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1",
+        (rarity["rarity"],),
+    )
+    species = cur.fetchone()
+    conn.close()
+    return species[0]
+
+
 def create_enemy() -> dict:
     #Enemies should contain a specific xp value depending on their enemy tier
     name = get_name()
     pfp = get_pfp()
     tier = get_tier()
     xp = TIER_VALUES[tier]["xp"]
+    species = roll_species()
     attributes = {attr : rarity_generation(tier) for attr in dbChar.ATTRIBUTES}
+    attributes = dbChar.apply_species_buffs(species, None , "enemy", attributes)
+    buffs = dbChar.get_species_buffs(species)
     enemy = {
         "name": name,
         "pfp": pfp,
+        "species": species,
         "tier": tier,
         "xp": xp,
+        "buffs": buffs,
         "attributes": attributes
     }
     return enemy
