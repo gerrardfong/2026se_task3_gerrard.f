@@ -60,11 +60,11 @@ ENEMY_TIER_WEIGHTS = {
 },
 }
 
-XP_VALUES = {
-    "Easy": "1",
-    "Intermediate": "20",
-    "Hard": "50",
-    "Impossible": "100",
+TIER_VALUES = {
+    "Easy": {"weight": 50 , "xp": 1},
+    "Intermediate": {"weight": 35, "xp": 25},
+    "Hard": {"weight": 15, "xp": 50},
+    "Impossible": {"weight": 5, "xp": 100},
 }
 
 def get_name() -> str:
@@ -80,11 +80,43 @@ def get_name() -> str:
 def get_pfp() -> str:
     return random.choice(RANDOM_PFP)
 
-def get_tier():
-    pass
 
+def get_tier():
+    tier = random.choices(
+        population=list(TIER_VALUES.keys()),
+        weights=[tier["weight"] for tier in TIER_VALUES.values()],
+        k=1
+    )[0]
+    return tier
+
+def rarity_generation(tier = None) -> dict:
+    rarity = random.choices(
+        population=list(ENEMY_TIER_WEIGHTS[tier].keys()),
+        weights=list(ENEMY_TIER_WEIGHTS[tier].values()),
+        k=1,
+    )[0]
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT level FROM rarities WHERE rarity=? ORDER BY RANDOM() LIMIT 1", (rarity,)
+    )
+    row = cur.fetchone()
+    conn.close()
+    return {"rarity": rarity, "level": row[0]}
 
 def create_enemy() -> dict:
     #Enemies should contain a specific xp value depending on their enemy tier
-    user_id = None
-    attributes = {}
+    name = get_name()
+    pfp = get_pfp()
+    tier = get_tier()
+    xp = TIER_VALUES[tier]["xp"]
+    attributes = {attr : rarity_generation(tier) for attr in dbChar.ATTRIBUTES}
+    enemy = {
+        "name": name,
+        "pfp": pfp,
+        "tier": tier,
+        "xp": xp,
+        "attributes": attributes
+    }
+    return enemy
+    
