@@ -121,3 +121,9 @@ Plan for today:
     - (added) implement modals/pop-ups that prevent users from roll past high-rarity rolls
     - (added) add a toggle button that disables pop-ups and what rarities can be skipped
 
+- Made enemy_generation() return a dict rather than creating a new enemy sql schema
+    - Plan is to store enemy dict in session to allow constant generation as the enemies are meant to be generated then deleted when they're defeated
+    - Bosses on the otherhand will be hardcoded by me with customised stats and can be pulled from a sql schema when a certain wave is reached in gauntlet
+- Finished goals of Sprint 2 as stated above in Sprint 2 targets
+- Using Agent to check that this Sprint is safe to merge back into Main
+
