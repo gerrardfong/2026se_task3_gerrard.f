@@ -84,7 +84,7 @@ def get_pfp() -> str:
 def get_tier():
     tier = random.choices(
         population=list(TIER_VALUES.keys()),
-        weights=[tier["weight"] for tier in TIER_VALUES.values()],
+        weights=[Tier["weight"] for Tier in TIER_VALUES.values()],
         k=1
     )[0]
     return tier
