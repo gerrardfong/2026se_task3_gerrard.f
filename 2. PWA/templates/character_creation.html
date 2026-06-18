@@ -96,7 +96,7 @@
           </details>
           {% endfor %}
           {% else %}
-          <div class="border rounded-3 text-muted">No characters yet. Create one!</div>
+          <div class="border rounded-3 text-muted px-3 py-3">No characters yet. Create one!</div>
           {% endif %}
         </div>
       </div>
@@ -106,11 +106,13 @@
     <div class="col-12 col-md-6">
       <div class="border border-2 rounded-4 p-4 bg-white">
         <h2 class="mb-3">Create a Character</h2>
-        <form id="create-character" methods="POST" action="/api/create-character">
+        <form id="create-character" method="POST" action="/api/create-character">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <input type="text" class="border rounded-3 form-control" placeholder="Enter character name" required>
-          <div class="d-flex align-items-center gap-2 mt-2">
-            <input type="file" name="pfp" id="create-pfp-input" class="form-control" accpet="image/*">
+          <input type="text" name="name" class="border rounded-3 form-control" placeholder="Enter character name"
+            required>
+          <div class="d-flex align-items-center gap-2 my-4">
+            <input type="file" id="create-pfp-input" class="form-control" accept="image/*">
+            <input type="hidden" name="pfp" id="create-pfp-data">
             <div class="pfp-preview-wrap">
               <img id="create-pfp-preview" class="pfp-preview">
               <span id="create-pfp-placeholder" class="pfp-preview-placeholder">No Image</span>
@@ -131,8 +133,8 @@
             {% for attr, roll in pending_roll.attributes.items() if attr==name %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <span>{{ attr }}</span>
-              <span class="fw-bold">{{ roll.level }} <span class="rarity-{{ roll.ra }} ">({{ roll.rarity
-                  }})</span></span>
+              <span class="fw-bold">{{ roll.level }} <span class="fw-bold rarity-{{ roll.rarity }} ">({{
+                  roll.rarity}})</span></span>
             </li>
             {% endfor %}
             {% endfor %}

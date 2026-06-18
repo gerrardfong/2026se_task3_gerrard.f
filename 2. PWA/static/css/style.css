@@ -27,11 +27,12 @@
 }
 
 .rarity-Ultra {
-  color: #b8860b;
+  color: #FF620F;
 }
 
 .roll-level {
   font-weight: 700;
+
 }
 
 .roll-rarity {
@@ -50,7 +51,7 @@
 }
 
 .character-list-scroll {
-  max-height: 635px;
+  max-height: 560px;
   overflow-y: auto;
 }
 

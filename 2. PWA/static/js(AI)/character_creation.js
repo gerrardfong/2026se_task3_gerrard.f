@@ -342,7 +342,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <span>${name}</span>
             <span>
               <span class="fw-bold">${r.level}</span>
-              <span class="rarity-${r.rarity}">(${r.rarity})</span>
+              <span class="fw-bold rarity-${r.rarity}">(${r.rarity})</span>
             </span>
           </li>`;
         }
@@ -462,6 +462,8 @@ document.addEventListener("DOMContentLoaded", function () {
         createPfpPreview.src = e.target.result;
         createPfpPreview.classList.remove("d-none");
         createPfpPlaceholder.classList.add("d-none");
+        var hiddenPfp = document.getElementById("create-pfp-data");
+        if (hiddenPfp) hiddenPfp.value = e.target.result;
       };
       reader.readAsDataURL(file);
     });
