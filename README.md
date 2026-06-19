@@ -155,3 +155,13 @@ Plan for today:
 - Finished goals of Sprint 2 as stated above in Sprint 2 targets
 - Using Agent to check that this Sprint is safe to merge back into Main
 
+19/6/2026
+Feature WIP: Working on backend for gauntlet added functions: 
+- endless() stores character, kill, xp and enemy data in session and generates a new enemy after previous one is defeated and continues until character loses, 
+- waves() which consists of a fixed amount of enemies with every 5th one being a hardcoded boss, 
+- generate_enemy() just a re-instatement of create_enemy() from enemy_generation.py except this function comes with return conditions for waves(), 
+- add_xp() which adds xp from enemy to stored total_xp in session, 
+- save_xp() adds the stored total_xp to selected character via character_id, 
+- attribute_combat() which compares attribute ranks between enemy and character with the higher character being assigned a point to create an accumulative total  
+- battle_outcome() which decides what happens to the character depending on the point differentials returned from attribute_combat()
+
