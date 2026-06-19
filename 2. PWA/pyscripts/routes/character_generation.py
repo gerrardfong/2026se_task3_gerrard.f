@@ -305,10 +305,6 @@ def apply_species_buffs(species_id: int, character_id: int, mode=None, attribute
         return attributes
 
 
-
-def xp_gain(enemy: dict):
-    pass
-
 def levelup_attribute():
     pass
 

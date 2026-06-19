@@ -139,3 +139,5 @@ def create_enemy() -> dict:
     }
     return enemy
     
+def create_boss() -> dict:
+    pass
