@@ -165,3 +165,7 @@ Feature WIP: Working on backend for gauntlet added functions:
 - attribute_combat() which compares attribute ranks between enemy and character with the higher character being assigned a point to create an accumulative total  
 - battle_outcome() which decides what happens to the character depending on the point differentials returned from attribute_combat()
 
+20/6/2026:
+- New Feature: Add unique species to bosses that can be unlocked by users
+- There's an issue with the python environments for Jupyternb due to creation of new sprint so I'm developing in a new py file dedicated to sql commands
+
