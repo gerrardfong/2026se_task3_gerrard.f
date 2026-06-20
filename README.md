@@ -168,4 +168,13 @@ Feature WIP: Working on backend for gauntlet added functions:
 20/6/2026:
 - New Feature: Add unique species to bosses that can be unlocked by users
 - There's an issue with the python environments for Jupyternb due to creation of new sprint so I'm developing in a new py file dedicated to sql commands
+- Added new species and their according species buffs
+    - Shinigami
+    - Transcendent Being
+    - Superhuman
+    - Accursed Pact
+- Added unlocks_species_id and locked columns to bosses and species tables respectively
+    - This is the beginning for the unlocking species feature on boss kill
+- Implemented create_boss() and awakened_boss()
+
 
