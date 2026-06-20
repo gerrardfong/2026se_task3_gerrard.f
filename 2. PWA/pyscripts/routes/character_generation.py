@@ -51,11 +51,18 @@ def roll_attribute(attribute, character_id) -> str:
 
 def roll_species() -> tuple:
     rarity = rarity_generation()
+    user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
+    # Used AI to help construct SQL command
     cur.execute(
-        "SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1",
-        (rarity["rarity"],),
+        """
+        SELECT id FROM species 
+        WHERE rarity=? 
+        AND (locked=0 OR id IN (SELECT species_id FROM unlocked_species WHERE user_id=?))
+        ORDER BY RANDOM() LIMIT 1
+        """,
+        (rarity["rarity"], user_id),
     )
     species = cur.fetchone()
     conn.close()

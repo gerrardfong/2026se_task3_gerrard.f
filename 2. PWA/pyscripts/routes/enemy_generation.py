@@ -110,7 +110,7 @@ def roll_species() -> tuple:
     conn = sql.connect(db_path)
     cur = conn.cursor()
     cur.execute(
-        "SELECT id FROM species WHERE rarity=? ORDER BY RANDOM() LIMIT 1",
+        "SELECT id FROM species WHERE rarity=? AND locked = 0 ORDER BY RANDOM() LIMIT 1",
         (rarity["rarity"],),
     )
     species = cur.fetchone()
@@ -163,6 +163,7 @@ def create_boss() -> dict:
 
     boss = {
         "id": boss_id,
+        "is_boss": True,
         "name": name,
         "pfp": pfp,
         "species": species,
@@ -198,6 +199,7 @@ def awakened_boss(original_name: str):
 
     awakened_boss = {
         "id": boss_id,
+        "is_boss": True,
         "name": name,
         "pfp": pfp,
         "species": species,

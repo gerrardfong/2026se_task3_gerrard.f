@@ -10,6 +10,7 @@ ATTRIBUTES = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"]
 # Gamemode
 def endless(character_id: int):
     session["gauntlet"] ={
+        "user_id": session.get("user_id"),
         "mode": "endless",
         "character_id": character_id,
         "kills": 0,
@@ -22,6 +23,7 @@ def waves(character_id: int, total_waves: int):
     max_waves = 10
     total_waves = min(total_waves, max_waves)
     session["gauntlet"] = {
+        "user_id": session.get("user_id"),
         "mode": "waves",
         "character_id": character_id,
         "kills": 0,
@@ -71,7 +73,6 @@ def attribute_combat():
     ranks = cur.fetchall()
 
     enemy_attributes = session["gauntlet"]["current_enemy"]["attributes"]
-    
     character_points = 0
     enemy_points = 0
 
@@ -92,11 +93,23 @@ def battle_outcome() -> str:
     if character_points > enemy_points:
         add_xp()
         session['gauntlet']['kills'] += 1
+        current_enemy = session["gauntlet"]["current_enemy"]
+
+        if current_enemy["is_boss"]:
+            awakened = dbChar.awakened_boss(current_enemy["name"])
+            if awakened:
+                session["gauntlet"]["current_enemy"] = awakened
+                session.modified = True
+                return "boss_awakened"         
+            if current_enemy["unlocks_species_id"]:
+                unlock_species(current_enemy["unlocks_species_id"])
+
         if session['gauntlet']['mode'] == 'waves':
             session['gauntlet']['current_wave'] += 1
             if session['gauntlet']['current_wave'] > session['gauntlet']['total_waves']:
                 session.modified = True
                 return 'win'
+
         session['gauntlet']['current_enemy'] = generate_enemy()
         session.modified = True
         return 'character_win'
@@ -109,3 +122,12 @@ def battle_outcome() -> str:
         session.modified = True
         return 'draw'
 
+def unlock_species(unlocks_species_id: int):
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT OR IGNORE INTO unlocked_species VALUES (?,?)",
+        (session["gauntlet"]["user_id"], unlocks_species_id)
+    )
+    conn.commit()
+    conn.close()
