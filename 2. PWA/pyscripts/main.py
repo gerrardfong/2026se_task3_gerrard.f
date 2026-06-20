@@ -191,6 +191,32 @@ def gauntlet():
         return redirect("/index.html")
     return render_template("gauntlet.html")
 
+@app.route("/gauntlet_endless")
+def gauntlet_endless():
+    if not session.get("user_id"):
+        return redirect("/index.html")
+    characters = dbChar.view_characters()
+    return render_template("gauntlet_endless.html", characters=characters)
+
+@app.route("/gauntlet_waves")
+def gauntlet_waves():
+    if not session.get("user_id"):
+        return redirect("/index.html")
+    character_selected = bool(session.get("selected_character_id"))
+    if character_selected:
+        return render_template("gauntlet_waves.html", characters=[], character_selected=True)
+    characters = dbChar.view_characters()
+    return render_template("gauntlet_waves.html", characters=characters, character_selected=False)
+
+@app.route("/api/select-character", methods=["POST"])
+def api_select_character():
+    if not session.get("user_id"):
+        return redirect("/index.html")
+    character_id = request.form.get("character_id")
+    if not character_id:
+        return redirect("/gauntlet_waves")
+    session["selected_character_id"] = int(character_id)
+    return redirect("/gauntlet_waves")
 
 
 @app.route("/logout")

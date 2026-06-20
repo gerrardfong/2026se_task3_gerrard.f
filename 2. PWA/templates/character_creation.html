@@ -53,8 +53,8 @@
                   {% for name in attr_order %}
                     {% for attr in character.attributes if attr.attribute == name%}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <span>{{ attr.attribute }}</span>
-                      <span>
+                      <span class="d-flex align-items-center gap-2">
+                        <span>{{ attr.attribute }}</span>
                         {% set modifier = character.buffs.get(attr.attribute) %}
                         {% if modifier %}
                           {% if modifier > 0 %}
@@ -63,10 +63,12 @@
                           <span class="buff-negative">( {{ modifier }} )</span>
                           {% endif %}
                         {% endif %}
-                        <span class="fw-bold">{{ attr.level }}</span>
-                        <span class="fw-bold rarity-{{ attr.rarity}}">({{ attr.rarity }})</span>
-                      </span>
-                    </li>
+                        </span>
+                        <span class="d-flex align-items-center gap-1">
+                          <span class="fw-bold">{{ attr.level }}</span>
+                          <span class="fw-bold rarity-{{ attr.rarity }}">( {{ attr.rarity }} )</span>
+                        </span>
+                      </li>
                     {% endfor %}
                   {% endfor %}
                 {% else %}

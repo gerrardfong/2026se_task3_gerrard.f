@@ -1,0 +1,96 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+{% if not character_selected %}
+<div class="modal fade" id="forcedModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="forcedModalLabel">Select a Character</h2>
+      </div>
+      <div class="modal-body">
+        <div class="character-list-scroll">
+          {% if characters %}
+            {% for character in characters %}
+            <details class="mb-3 border rounded-4" data-character-id="{{ character.id }}">
+              <summary class="d-flex align-items-center justify-content-between px-3 py-2">
+                <div class="d-flex align-items-center gap-4">
+                  <div class="pfp-preview-wrap">
+                    {% if character.profile_image %}
+                    <img class="pfp-preview" src="{{ character.profile_image }}" alt="{{ character.name }} profile image">
+                    {% else %}
+                    <span class="pfp-preview-placeholder">No Image</span>
+                    {% endif %}
+                  </div>
+                  <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="fw-bold border rounded-3 rarity-{{ character.species_rarity }} small px-2 py-1 align-self-start">{{ character.species }}</span>
+                      <span class="border rounded-3 align-self-start px-2 py-1 small">XP: {{ character.xp }}</span>
+                    </div>
+                  </div>
+                </div>
+                <span>Show ⬇️</span>
+              </summary>
+              <div class="p-3">
+                <ul class="list-group border rounded-3">
+                  {% if character.attributes %}
+                  {% set attr_order = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"] %}
+                    {% for name in attr_order %}
+                      {% for attr in character.attributes if attr.attribute == name %}
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="d-flex align-items-center gap-2">
+                          <span>{{ attr.attribute }}</span>
+                          {% set modifier = character.buffs.get(attr.attribute) %}
+                          {% if modifier %}
+                            {% if modifier > 0 %}
+                            <span class="buff-positive">( +{{ modifier }} )</span>
+                            {% else %}
+                            <span class="buff-negative">( {{ modifier }} )</span>
+                            {% endif %}
+                          {% endif %}
+                        </span>
+                        <span class="d-flex align-items-center gap-1">
+                          <span class="fw-bold">{{ attr.level }}</span>
+                          <span class="fw-bold rarity-{{ attr.rarity }}">( {{ attr.rarity }} )</span>
+                        </span>
+                      </li>
+                      {% endfor %}
+                    {% endfor %}
+                  {% else %}
+                  <span class="border rounded-3 text-muted">No attributes found.</span>
+                  {% endif %}
+                </ul>
+              </div>
+            </details>
+            {% endfor %}
+          {% else %}
+          <div class="border rounded-3 text-muted px-3 py-3">No characters yet. Create one!</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        {% if not characters %}
+        <a href="/character-creation" class="btn btn-secondary">Make one!</a>
+        {% else %}
+        <form method="POST" action="/api/select-character">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="character_id" id="selectedCharacterId" value="">
+          <button type="submit" id="continueBtn" class="btn btn-primary" disabled>Continue</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container my-5">
+  <h1 class="display-4 fw-bold text-center">Waves</h1>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js(AI)/gauntlet_waves.js"></script>
+{% endblock %}
