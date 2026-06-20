@@ -1,5 +1,6 @@
 import sqlite3 as sql
 import random
+import copy
 from flask import session
 
 db_path = "../databases/characters/characters.db"
@@ -142,9 +143,16 @@ def view_characters() -> list:
 
 def preview_roll() -> dict:
     """Roll a random species and all attributes without persisting to the DB."""
+    user_id = session.get("user_id")
     conn = sql.connect(db_path)
     cur = conn.cursor()
-    cur.execute("SELECT id, species, rarity FROM species ORDER BY RANDOM() LIMIT 1")
+    cur.execute(
+        """
+        SELECT id, species, rarity 
+        FROM species 
+        WHERE locked=0 OR id IN (SELECT species_id FROM unlocked_species WHERE user_id=?)
+        ORDER BY RANDOM() LIMIT 1
+        """, (user_id,))
     row = cur.fetchone()
     conn.close()
     species_id = row[0]

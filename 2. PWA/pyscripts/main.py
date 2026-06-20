@@ -192,6 +192,7 @@ def gauntlet():
     return render_template("gauntlet.html")
 
 
+
 @app.route("/logout")
 def logout():
     session.clear()

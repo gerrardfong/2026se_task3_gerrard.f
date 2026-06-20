@@ -27,7 +27,8 @@
 }
 
 .rarity-Ultra {
-  color: #FF620F;
+  color: #ffffff;
+  text-shadow: 0 0 15px #000000;
 }
 
 .roll-level {
