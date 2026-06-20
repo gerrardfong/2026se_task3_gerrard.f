@@ -161,7 +161,7 @@ def preview_roll() -> dict:
     #rolls for attributes
     original_attributes = {attr: rarity_generation() for attr in ATTRIBUTES}
     #applies modifiers onto attributes if there are any 
-    attributes = apply_species_buffs(species_id, None, "preview", original_attributes)
+    attributes = apply_species_buffs(species_id, None, "preview", copy.deepcopy(original_attributes))
     buffs = get_species_buffs(species_id)
     session["pending_roll"] = {
         "species_id": species_id,

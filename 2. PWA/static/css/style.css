@@ -23,7 +23,8 @@
 }
 
 .rarity-Mythic {
-  color: #b91c1c;
+  color: #ff0000;
+  text-shadow: 0 0 15px #ff7272;
 }
 
 .rarity-Ultra {
