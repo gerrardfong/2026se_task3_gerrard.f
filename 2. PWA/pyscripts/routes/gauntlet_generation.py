@@ -15,6 +15,7 @@ def endless(character_id: int):
         "character_id": character_id,
         "kills": 0,
         "total_xp": 0,
+        "current_wave": 1,
         "current_enemy": generate_enemy()
     }
 
@@ -37,7 +38,7 @@ def waves(character_id: int, total_waves: int):
 # Creates enemy for waves and endless
 def generate_enemy():
     current_wave = session["gauntlet"]["current_wave"]
-    if current_wave % 5:
+    if current_wave % 5 == 0:
         return dbChar.create_boss()
     return dbChar.create_enemy()
 
@@ -52,10 +53,12 @@ def save_xp():
     cur = conn.cursor()
     cur.execute(
         """
-            UPDATE characters SET xp = xp + ? WHERE id = ?,
+        UPDATE characters SET xp = xp + ? WHERE id = ?
         """,
         (session["gauntlet"]["total_xp"], session["gauntlet"]["character_id"])
     )
+    conn.commit()
+    conn.close()
 
 def attribute_combat():
     conn = sql.connect(db_path)
@@ -70,7 +73,7 @@ def attribute_combat():
     cur.execute(
         "SELECT level, rank FROM rarities"
     )
-    ranks = cur.fetchall()
+    ranks = {row[0]: row[1] for row in cur.fetchall()}
 
     enemy_attributes = session["gauntlet"]["current_enemy"]["attributes"]
     character_points = 0
@@ -95,7 +98,7 @@ def battle_outcome() -> str:
         session['gauntlet']['kills'] += 1
         current_enemy = session["gauntlet"]["current_enemy"]
 
-        if current_enemy["is_boss"]:
+        if current_enemy.get("is_boss"):
             awakened = dbChar.awakened_boss(current_enemy["name"])
             if awakened:
                 session["gauntlet"]["current_enemy"] = awakened
@@ -108,13 +111,15 @@ def battle_outcome() -> str:
             session['gauntlet']['current_wave'] += 1
             if session['gauntlet']['current_wave'] > session['gauntlet']['total_waves']:
                 session.modified = True
+                save_xp()
                 return 'win'
-
+        
         session['gauntlet']['current_enemy'] = generate_enemy()
         session.modified = True
         return 'character_win'
 
     elif enemy_points > character_points:
+        save_xp()
         return 'game_over'
 
     else:
