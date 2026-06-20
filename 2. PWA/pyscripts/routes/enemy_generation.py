@@ -140,4 +140,71 @@ def create_enemy() -> dict:
     return enemy
     
 def create_boss() -> dict:
-    pass
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT id, name, pfp, species, tier, xp, unlocks_species_id 
+        FROM bosses 
+        WHERE name NOT LIKE "%_awakened"
+        ORDER BY RANDOM() LIMIT 1
+        """,
+    )
+    boss_data = cur.fetchone()
+    boss_id, name, pfp, species, tier, xp, unlocks_species_id = boss_data
+
+    cur.execute(
+        """
+        SELECT attribute, level FROM boss_attributes WHERE boss_id=?
+        """,
+        (boss_id,)
+    )
+    attributes = {row[0]: {"level": row[1]} for row in cur.fetchall()}
+
+    boss = {
+        "id": boss_id,
+        "name": name,
+        "pfp": pfp,
+        "species": species,
+        "tier": tier,
+        "xp": xp,
+        "unlocks_species_id": unlocks_species_id,
+        "attributes": attributes,
+    }
+    conn.close()
+    return boss
+
+def awakened_boss(original_name: str):
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT id, name, pfp, species, tier, xp, unlocks_species_id
+        FROM bosses
+        WHERE name=?
+        """, (original_name + "_awakened",)
+    )
+
+    awakened_boss_data = cur.fetchone()
+    boss_id, name, pfp, species, tier, xp, unlocks_species_id = awakened_boss_data
+
+    cur.execute(
+        """
+        SELECT attribute, level FROM boss_attributes WHERE boss_id=?
+        """,
+        (boss_id,)
+    )
+    attributes = {row[0]: {"level": row[1]} for row in cur.fetchall()}
+
+    awakened_boss = {
+        "id": boss_id,
+        "name": name,
+        "pfp": pfp,
+        "species": species,
+        "tier": tier,
+        "xp": xp,
+        "unlocks_species_id": unlocks_species_id,
+        "attributes": attributes,
+    }
+    conn.close()
+    return awakened_boss    
