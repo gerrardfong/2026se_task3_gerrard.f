@@ -6,15 +6,14 @@ from flask import session
 db_path = "../databases/characters/characters.db"
 
 RARITY_WEIGHTS = {
-    "Common": 60,
+    "Common": 35,
     "Uncommon": 15,
-    "Rare": 10,
-    "Epic": 6,
-    "Legendary": 2.5,
-    "Mythic": 1,
-    "Ultra": 0.5,
+    "Rare": 20,
+    "Epic": 15 ,
+    "Legendary": 10,
+    "Mythic": 3.5,
+    "Ultra": 1.5,
 }
-
 
 ATTRIBUTES = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"]
 

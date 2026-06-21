@@ -32,6 +32,9 @@ A RNG-driven character progression game featuring randomly generated characters,
 | PB-18 | User wants to be able to have species locked until boss is defeated | P3 | Locked species cannot be selected until unlocked | Done |
 | PB-19 | User wants to be able to submit feedback | P4 | Feedback stored successfully | In Progress |
 | PB-20 | User wants to be able to access a responsive and optimised UI | P4 | UI adapts to mobile and desktop layouts | In Progress |
+| PB-21 | User wants to be able to have a viewable list that shows the hierarchy of levels in Character Creation | P3 | A basic container with the levels and their according rarities  | In Progress |
+| PB-22 | User wants to be able to see a grid that shows who won in each attribute category after tapping the battle button | P3 | Each attribute is equally distributed from one another with a reasonably sized pfp-preview for the winning character | Done |
+
 ---
 
 ## Changelog
@@ -161,3 +164,4 @@ A RNG-driven character progression game featuring randomly generated characters,
 - Updated PB-17 and PB-18 to reflect completed unlock system.
 - Marked UI optimisation (PB-20) as in progress due to remaining frontend work.
 - Aligned all backlog statuses with Sprint 1–4 implementation evidence.
+- Implemented (PB-22) through Agent to implement the JS and built the modal container along with other api-routes relevant to gauntlet_waves.html
