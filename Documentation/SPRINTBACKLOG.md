@@ -1,4 +1,4 @@
-# Sprint Backlog
+# SPRINTBACKLOG.md
 
 ---
 
@@ -6,56 +6,66 @@
 
 ## Sprint Goal
 
-Implement the core character creation system and RNG generation functionality.
+Develop the core character creation system, including RNG generation, character management, and frontend navigation.
 
-### Committed Items
+## Committed Items
 
-* PB-03 Generate character using RNG
-* PB-04 Preview character rolls
-* PB-05 Apply species buffs
+- PB-01 User Login System
+- PB-03 RNG Character Generation
+- PB-04 Character Roll Preview
+- PB-06 Rename Character
+- PB-07 Delete Character
+- PB-08 Edit Profile Image
 
-### Sprint Plan
+## Sprint Plan
 
-1. Create character generation database schema.
-2. Implement attribute RNG functions.
-3. Implement species RNG functions.
-4. Create roll preview functionality.
-5. Apply species buff calculations.
-6. Test database insertion procedures.
+1. Develop RNG species generation system.
+2. Develop RNG attribute generation system.
+3. Create character creation frontend.
+4. Create navigation and main menu UI.
+5. Implement rename and delete character routes.
+6. Implement roll preview functionality 
 
-### Unit Test Summary
+## Unit Test Summary
 
-| Test Case                | Expected Result                   | Actual Result | Status  |
-| ------------------------ | --------------------------------- | ------------- | ------- |
-| RNG Attribute Generation | Attributes generated successfully | Pending       | Pending |
-| Species Buff Application | Buffs modify attributes correctly | Pending       | Pending |
-| Character Creation       | Character inserted into database  | Pending       | Pending |
+| Test ID | Test Name | What It Tests | Input | Expected Output | Actual Output | Pass / Fail |
+|----------|------------|---------------|---------|-----------------|---------------|-------------|
+| T1-01 | User Login | PB-01 User Login authentication | Valid username/password | User redirected to main menu and session created | | |
+| T1-02 | Species Roll | PB-03 RNG species generation | Roll request | Random species returned | | |
+| T1-03 | Attribute Roll | PB-03 RNG attribute generation | Roll request | Random attributes returned | | |
+| T1-04 | Roll Preview | PB-04 Preview generated character | Preview request | Character displayed before saving | | |
+| T1-05 | Rename Character | PB-06 Rename functionality | Character ID + new name | Character name updated | | |
+| T1-06 | Delete Character | PB-07 Delete functionality | Character ID | Character removed from database | | |
+| T1-07 | Profile Image Preview | PB-08 Profile image preview | Uploaded image | Image displayed correctly | | |
 
-### Sprint Review
+## Sprint Review
 
-**Completed:**
+### Completed
+- RNG system completed.
+- Character creation interface completed.
+- Main menu and navigation bar implemented.
+- Roll preview functionality completed.
+- Rename and delete character features completed.
 
-* Completed RNG generation.
-* Implemented species rolling.
-* Implemented character preview system.
+### Incomplete
+- Profile image editing moved to later sprint.
 
-**Not Completed:**
+### Issues Encountered
+- PB-04 Roll Preview, client has requested that rolls should be able to be viewed before saving into character. This requires JS in order to store rolls into variables which can altered and viewed on the page (I don't know JS) so I have to discuss with client whether they're fine with rendering the whole page again after rolling or whether they want JS implementation.
+- (Fixed) PB-04 Client requested JS implementation so I had to use AI and simplify HTML to the extent where it would only use "ids" and not "onclick" or any other functions
+- PB-08 required AI since I wasn't sure how to create the CSS for the pfp picture preview and also needed to be able to accept GIFs format and specific sizing
 
-* List unfinished tasks.
+## Sprint Retrospective
 
-### Sprint Retrospective
+### What Went Well
+- Core systems completed quickly.
+- Database integration worked as expected.
 
-**What went well**
+### Improvements
+- Better planning for future feature dependencies.
 
-* RNG system completed quickly.
-
-**What could improve**
-
-* Better planning of database dependencies.
-
-**Actions for next sprint**
-
-* Finalise frontend integration earlier.
+### Actions for Next Sprint
+- Begin progression and combat development.
 
 ---
 
@@ -63,57 +73,62 @@ Implement the core character creation system and RNG generation functionality.
 
 ## Sprint Goal
 
-Implement enemy generation, gauntlet preparation and progression systems.
+Implement progression systems, species buffs and enemy generation required for combat systems.
 
-### Committed Items
+## Committed Items
 
-* PB-09 Gauntlet mode
-* PB-10 Random enemy generation
-* PB-12 XP rewards
-* PB-13 XP thresholds
+- PB-05 Species Buff System
+- PB-10 Enemy Generation
+- PB-12 XP System
+- PB-13 XP Thresholds
 
-### Sprint Plan
+## Sprint Plan
 
-1. Create enemy generation functions.
-2. Create gauntlet route and frontend.
-3. Implement XP calculations.
-4. Create XP threshold system.
-5. Implement rarity popup warnings.
-6. Test progression functionality.
+1. Add XP tracking to characters.
+2. Add rarity thresholds.
+3. Develop species buff calculations.
+4. Develop enemy generation system.
+5. Implement rarity warning popups.
+6. Implement popup toggle preferences.
 
-### Unit Test Summary
+## Unit Test Summary
 
-| Test Case        | Expected Result                | Actual Result | Status  |
-| ---------------- | ------------------------------ | ------------- | ------- |
-| Enemy Generation | Enemy generated successfully   | Pending       | Pending |
-| XP Awarding      | XP added correctly             | Pending       | Pending |
-| XP Thresholds    | Threshold calculations correct | Pending       | Pending |
+| Test ID | Test Name | What It Tests | Input | Expected Output | Actual Output | Pass / Fail |
+|----------|------------|---------------|---------|-----------------|---------------|-------------|
+| T2-01 | Species Buff Application | PB-05 Buff calculation | Generated character | Correct modifiers applied | | |
+| T2-02 | XP Storage | PB-12 XP system | XP reward | XP stored successfully | | |
+| T2-03 | XP Threshold | PB-13 XP threshold progression | XP value exceeding threshold | Threshold recognised correctly | | |
+| T2-04 | Enemy Generation | PB-10 Enemy generation | Generate enemy request | Enemy generated with random attributes | | |
+| T2-05 | Roll Confirmation Popup | PB-15 Rarity protection popup | High rarity roll | Warning popup displayed | | |
+| T2-06 | Popup Toggle | PB-16 Popup preferences | Toggle setting | Popup behaviour changes correctly | | |
 
-### Sprint Review
+## Sprint Review
 
-**Completed:**
+### Completed
+- Added XP column.
+- Added threshold column.
+- Implemented species buffs.
+- Implemented enemy generation backend.
 
-* Completed enemy generation.
-* Added XP threshold system.
-* Added rarity popup functionality.
+### Incomplete
+- Full gauntlet mode deferred and redirected to Sprint 3
 
-**Not Completed:**
+### Issues Encountered
+- Sprint priorities changed due to client requests.
+- Database structures required redesign.
+- Enemies data structure had to be re-evaluated from 
 
-* List unfinished tasks.
+## Sprint Retrospective
 
-### Sprint Retrospective
+### What Went Well
+- Database redesign completed successfully.
+- Species buff system integrated correctly.
 
-**What went well**
+### Improvements
+- Reduce sprint scope changes.
 
-* Backend development progressed smoothly.
-
-**What could improve**
-
-* Better management of changing client requests.
-
-**Actions for next sprint**
-
-* Focus on combat implementation.
+### Actions for Next Sprint
+- Focus entirely on combat implementation.
 
 ---
 
@@ -121,54 +136,66 @@ Implement enemy generation, gauntlet preparation and progression systems.
 
 ## Sprint Goal
 
-Implement combat mechanics and gauntlet gameplay.
+Develop and implement the gauntlet combat system.
 
-### Committed Items
+## Committed Items
 
-* PB-09 Gauntlet mode
-* PB-11 Boss encounters
-* PB-14 Attribute-based combat
+- PB-09 Gauntlet Gamemode
+- PB-10 Enemy Generation
+- PB-11 Boss Encounters
+- PB-12 XP Rewards
+- PB-14 Combat System
 
-### Sprint Plan
+## Sprint Plan
 
-1. Implement attribute comparison system.
-2. Create battle outcome calculations.
-3. Implement wave progression.
-4. Create boss encounter system.
-5. Integrate XP rewards into combat.
-6. Conduct combat testing.
+1. Implement endless gauntlet mode.
+2. Implement wave-based gauntlet mode.
+3. Implement attribute comparison combat.
+4. Implement XP rewards.
+5. Implement boss encounters.
+6. Connect combat to character progression.
 
-### Unit Test Summary
+## Unit Test Summary
 
-| Test Case        | Expected Result             | Actual Result | Status  |
-| ---------------- | --------------------------- | ------------- | ------- |
-| Attribute Combat | Correct winner determined   | Pending       | Pending |
-| Battle Outcome   | Outcome generated correctly | Pending       | Pending |
-| Boss Encounters  | Bosses load correctly       | Pending       | Pending |
+| Test ID | Test Name | What It Tests | Input | Expected Output | Actual Output | Pass / Fail |
+|----------|------------|---------------|---------|-----------------|---------------|-------------|
+| T3-01 | Endless Mode | PB-09 Endless gauntlet | Start endless run | Enemies continuously generated | | |
+| T3-02 | Wave Mode | PB-09 Wave gauntlet | Start wave run | Fixed wave progression generated | | |
+| T3-03 | Attribute Combat | PB-14 Combat calculation | Character vs enemy attributes | Correct winner calculated | | |
+| T3-04 | XP Reward | PB-12 XP rewards | Enemy defeat | XP added to session total | | |
+| T3-05 | XP Save | PB-12 XP persistence | End combat | XP saved to database | | |
+| T3-06 | Boss Encounter | PB-11 Boss generation | Boss wave reached | Boss generated correctly | | |
+| T3-07 | Battle Outcome | PB-14 Outcome handling | Combat result | Correct win/loss outcome returned | | |
 
-### Sprint Review
+## Sprint Review
 
-**Completed:**
+### Completed
+- endless()
+- waves()
+- generate_enemy()
+- add_xp()
+- save_xp()
+- attribute_combat()
+- battle_outcome()
+- Session-based enemy management.
 
-* Record completed work.
+### Incomplete
+- Leaderboards.
+- Combat animations.
 
-**Not Completed:**
+### Issues Encountered
+- Frontend development slower than backend implementation.
 
-* Record unfinished work.
+## Sprint Retrospective
 
-### Sprint Retrospective
+### What Went Well
+- Core combat systems completed successfully.
 
-**What went well**
+### Improvements
+- Better frontend planning.
 
-* Record positives.
-
-**What could improve**
-
-* Record issues encountered.
-
-**Actions for next sprint**
-
-* Record improvements.
+### Actions for Next Sprint
+- Complete boss progression systems.
 
 ---
 
@@ -176,53 +203,61 @@ Implement combat mechanics and gauntlet gameplay.
 
 ## Sprint Goal
 
-Implement quality-of-life features, optimisation and final testing.
+Implement boss progression, unlockable species and final quality-of-life improvements.
 
-### Committed Items
+## Committed Items
 
-* PB-06 Rename character
-* PB-07 Delete character
-* PB-08 Edit profile image
-* PB-15 Rarity confirmations
-* PB-16 Popup configuration
+- PB-11 Boss Encounters
+- PB-17 Unlockable Species
+- PB-18 Species Unlock Progression
+- PB-19 User Feedback System
+- PB-20 UI Optimisation
 
-### Sprint Plan
+## Sprint Plan
 
-1. Finalise character management features.
-2. Improve UI consistency.
-3. Improve mobile responsiveness.
-4. Conduct integration testing.
-5. Conduct user acceptance testing.
-6. Fix reported bugs.
+1. Implement unlockable species rewards.
+2. Create awakened boss system.
+3. Implement user feedback button.
+4. Improve mobile responsiveness.
+5. Improve UI consistency.
+6. Perform final testing and optimisation.
 
-### Unit Test Summary
+## Unit Test Summary
 
-| Test Case          | Expected Result        | Actual Result | Status  |
-| ------------------ | ---------------------- | ------------- | ------- |
-| Rename Character   | Character name updates | Pending       | Pending |
-| Delete Character   | Character removed      | Pending       | Pending |
-| Edit Profile Image | Image updated          | Pending       | Pending |
+| Test ID | Test Name | What It Tests | Input | Expected Output | Actual Output | Pass / Fail |
+|----------|------------|---------------|---------|-----------------|---------------|-------------|
+| T4-01 | Boss Unlock Rewards | PB-17 Species unlock rewards | Defeat unlockable boss | Species unlocked successfully | | |
+| T4-02 | Locked Species Restriction | PB-18 Locked species control | Generate character | Locked species unavailable | | |
+| T4-03 | Awakened Boss Generation | PB-11 Boss progression | Boss encounter trigger | Correct awakened boss generated | | |
+| T4-04 | Species Buff Integration | PB-18 New species buffs | Generate unlocked species | Correct buffs applied | | |
+| T4-05 | Feedback Submission | PB-19 User feedback system | Submit feedback | Feedback stored successfully | | |
+| T4-06 | Mobile Layout | PB-20 Mobile optimisation | Open application on mobile | Responsive layout displayed | | |
 
-### Sprint Review
+## Sprint Review
 
-**Completed:**
+### Completed
+- Added Shinigami species.
+- Added Transcendent Being species.
+- Added Superhuman species.
+- Added Accursed Pact species.
+- Added unlockable species architecture.
+- Added boss unlock rewards.
+- Implemented create_boss().
+- Implemented awakened_boss().
 
-* Record completed work.
+### Incomplete
+- To be completed during development.
 
-**Not Completed:**
+### Issues Encountered
+- Python environment issues between sprint branches.
 
-* Record unfinished work.
+## Sprint Retrospective
 
-### Sprint Retrospective
+### What Went Well
+- Unlockable species system expanded progression significantly.
 
-**What went well**
+### Improvements
+- Better environment management between sprints.
 
-* Record positives.
-
-**What could improve**
-
-* Record issues encountered.
-
-**Actions for future development**
-
-* Record recommendations.
+### Actions for Future Development
+- Final optimisation and bug fixing.
