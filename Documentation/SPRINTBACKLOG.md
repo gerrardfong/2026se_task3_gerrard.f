@@ -145,6 +145,9 @@ Develop and implement the gauntlet combat system.
 - PB-11 Boss Encounters
 - PB-12 XP Rewards
 - PB-14 Combat System
+- PB-11 Boss Encounters
+- PB-17 Unlockable Species
+- PB-18 Species Unlock Progression
 
 ## Sprint Plan
 
@@ -154,6 +157,8 @@ Develop and implement the gauntlet combat system.
 4. Implement XP rewards.
 5. Implement boss encounters.
 6. Connect combat to character progression.
+7. Implement unlockable species rewards.
+8. Create awakened boss system.
 
 ## Unit Test Summary
 
@@ -166,11 +171,14 @@ Develop and implement the gauntlet combat system.
 | T3-05 | XP Save | PB-12 XP persistence | End combat | XP saved to database | | |
 | T3-06 | Boss Encounter | PB-11 Boss generation | Boss wave reached | Boss generated correctly | | |
 | T3-07 | Battle Outcome | PB-14 Outcome handling | Combat result | Correct win/loss outcome returned | | |
+| T3-08 | Boss Unlock Rewards | PB-17 Species unlock rewards | Defeat unlockable boss | Species unlocked successfully | | |
+| T3-09 | Locked Species Restriction | PB-18 Locked species control | Generate character | Locked species unavailable | | |
+| T3-10 | Awakened Boss Generation | PB-11 Boss progression | Boss encounter trigger | Correct awakened boss generated | | |
+| T3-11 | Species Buff Integration | PB-18 New species buffs | Generate unlocked species | Correct buffs applied | | |
 
 ## Sprint Review
 
 ### Completed
-- endless()
 - waves()
 - generate_enemy()
 - add_xp()
@@ -178,6 +186,14 @@ Develop and implement the gauntlet combat system.
 - attribute_combat()
 - battle_outcome()
 - Session-based enemy management.
+- Added Shinigami species.
+- Added Transcendent Being species.
+- Added Superhuman species.
+- Added Accursed Pact species.
+- Added unlockable species architecture.
+- Added boss unlock rewards.
+- Implemented create_boss().
+- Implemented awakened_boss().
 
 ### Incomplete
 - Leaderboards.
@@ -190,12 +206,13 @@ Develop and implement the gauntlet combat system.
 
 ### What Went Well
 - Core combat systems completed successfully.
+- Unlockable species system expanded progression significantly.
 
 ### Improvements
 - Better frontend planning.
 
 ### Actions for Next Sprint
-- Complete boss progression systems.
+- Pushing endless() to next sprint and refining UI for Gauntlet
 
 ---
 
@@ -203,47 +220,30 @@ Develop and implement the gauntlet combat system.
 
 ## Sprint Goal
 
-Implement boss progression, unlockable species and final quality-of-life improvements.
+Implement final quality-of-life improvements.
 
 ## Committed Items
-
-- PB-11 Boss Encounters
-- PB-17 Unlockable Species
-- PB-18 Species Unlock Progression
 - PB-19 User Feedback System
 - PB-20 UI Optimisation
 
 ## Sprint Plan
-
-1. Implement unlockable species rewards.
-2. Create awakened boss system.
-3. Implement user feedback button.
-4. Improve mobile responsiveness.
-5. Improve UI consistency.
-6. Perform final testing and optimisation.
+1. Implement user feedback button.
+2. Improve mobile responsiveness.
+3. Improve UI consistency.
+4. Perform final testing and optimisation.
+5. (Added) endless()
 
 ## Unit Test Summary
 
 | Test ID | Test Name | What It Tests | Input | Expected Output | Actual Output | Pass / Fail |
 |----------|------------|---------------|---------|-----------------|---------------|-------------|
-| T4-01 | Boss Unlock Rewards | PB-17 Species unlock rewards | Defeat unlockable boss | Species unlocked successfully | | |
-| T4-02 | Locked Species Restriction | PB-18 Locked species control | Generate character | Locked species unavailable | | |
-| T4-03 | Awakened Boss Generation | PB-11 Boss progression | Boss encounter trigger | Correct awakened boss generated | | |
-| T4-04 | Species Buff Integration | PB-18 New species buffs | Generate unlocked species | Correct buffs applied | | |
-| T4-05 | Feedback Submission | PB-19 User feedback system | Submit feedback | Feedback stored successfully | | |
-| T4-06 | Mobile Layout | PB-20 Mobile optimisation | Open application on mobile | Responsive layout displayed | | |
+| T4-01 | Feedback Submission | PB-19 User feedback system | Submit feedback | Feedback stored successfully | | |
+| T4-02 | Mobile Layout | PB-20 Mobile optimisation | Open application on mobile | Responsive layout displayed | | |
 
 ## Sprint Review
 
 ### Completed
-- Added Shinigami species.
-- Added Transcendent Being species.
-- Added Superhuman species.
-- Added Accursed Pact species.
-- Added unlockable species architecture.
-- Added boss unlock rewards.
-- Implemented create_boss().
-- Implemented awakened_boss().
+- Nothing currently
 
 ### Incomplete
 - To be completed during development.
@@ -254,10 +254,10 @@ Implement boss progression, unlockable species and final quality-of-life improve
 ## Sprint Retrospective
 
 ### What Went Well
-- Unlockable species system expanded progression significantly.
+- N/A
 
 ### Improvements
-- Better environment management between sprints.
+- N/A
 
 ### Actions for Future Development
-- Final optimisation and bug fixing.
+- N/A

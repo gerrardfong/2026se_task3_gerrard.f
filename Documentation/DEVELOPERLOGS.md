@@ -113,5 +113,6 @@ Feature WIP: Working on backend for gauntlet added functions:
 - Added unlocks_species_id and locked columns to bosses and species tables respectively
     - This is the beginning for the unlocking species feature on boss kill
 - Implemented create_boss() and awakened_boss()
+- Pushing endless() creation to Sprint 4
 
 
