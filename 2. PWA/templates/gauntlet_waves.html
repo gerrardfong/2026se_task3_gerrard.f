@@ -24,6 +24,7 @@
                     {% endif %}
                   </div>
                   <div class="d-flex flex-column">
+                    <span class="fw-bold mb-1">{{ character.name }}</span>
                     <div class="d-flex align-items-center gap-2">
                       <span class="fw-bold border rounded-3 rarity-{{ character.species_rarity }} small px-2 py-1 align-self-start">{{ character.species }}</span>
                       <span class="border rounded-3 align-self-start px-2 py-1 small">XP: {{ character.xp }}</span>
@@ -86,7 +87,139 @@
 {% endif %}
 
 <div class="container my-5">
-  <h1 class="display-4 fw-bold text-center">Waves</h1>
+  <h1 class="display-4 fw-bold text-center mb-4">Waves</h1>
+
+  {% if gauntlet %}
+  <div class="text-center mb-4">
+    <span class="border rounded-3 px-3 py-2 fw-bold">Wave {{ gauntlet.current_wave }} / {{ gauntlet.total_waves }}</span>
+  </div>
+  {% endif %}
+
+  <div class="row align-items-center g-3">
+    <div class="col-5">
+      <div class="border rounded-4 p-3">
+        {% if character %}
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="pfp-preview-wrap">
+            {% if character.profile_image %}
+            <img class="pfp-preview" src="{{ character.profile_image }}" alt="{{ character.name }}">
+            {% else %}
+            <span class="pfp-preview-placeholder">No Image</span>
+            {% endif %}
+          </div>
+          <div>
+            <h5 class="mb-2">{{ character.name }}</h5>
+            <span class="fw-bold border rounded-3 rarity-{{ character.species_rarity }} small px-2 py-1">{{ character.species }}</span>
+          </div>
+        </div>
+        <ul class="list-group border rounded-3">
+          {% set attr_order = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"] %}
+          {% for name in attr_order %}
+            {% for attr in character.attributes if attr.attribute == name %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="d-flex align-items-center gap-2">
+                <span>{{ attr.attribute }}</span>
+                {% set modifier = character.buffs.get(attr.attribute) %}
+                {% if modifier %}
+                  {% if modifier > 0 %}
+                  <span class="buff-positive">( +{{ modifier }} )</span>
+                  {% else %}
+                  <span class="buff-negative">( {{ modifier }} )</span>
+                  {% endif %}
+                {% endif %}
+              </span>
+              <span class="d-flex align-items-center gap-1">
+                <span class="fw-bold">{{ attr.level }}</span>
+                <span class="fw-bold rarity-{{ attr.rarity }}">( {{ attr.rarity }} )</span>
+              </span>
+            </li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center text-muted py-5">No character selected</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-2 text-center">
+      {% if not gauntlet %}
+      <form method="POST" action="/api/start-waves">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn rounded-circle p-3" {% if not character_selected %}disabled{% endif %}>
+          <img src="/static/images/start.png" width="80" height="80">
+        </button>
+      </form>
+      {% else %}
+      <form id="battleForm" method="POST" action="/api/battle">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-outline-secondary rounded-circle p-3">
+          <img src="/static/images/favicon.png" width="40" height="40">
+        </button>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="modal fade" id="battleResultModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="battleResultTitle">Battle Result</h5>
+          </div>
+          <div class="modal-body">
+            <p id="battleResultMessage" class="fs-5 text-center mb-3"></p>
+            <div class="row row-cols-3 g-2 text-center" id="attributeGrid"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="battleResultClose">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-5">
+      <div class="border rounded-4 p-3">
+        {% if gauntlet and gauntlet.current_enemy %}
+        {% set enemy = gauntlet.current_enemy %}
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="pfp-preview-wrap">
+            {% if enemy.pfp %}
+            <img class="pfp-preview" src="{{ enemy.pfp }}" alt="{{ enemy.name }}">
+            {% else %}
+            <span class="pfp-preview-placeholder">No Image</span>
+            {% endif %}
+          </div>
+          <div>
+            <h5 class="mb-1">{{ enemy.name }}</h5>
+            {% if enemy.is_boss %}
+            <span class="fw-bold border rounded-3 rarity-Legendary small px-2 py-1">BOSS</span>
+            {% else %}
+            <span class="fw-bold border rounded-3 small px-2 py-1">{{ enemy.tier }}</span>
+            {% endif %}
+          </div>
+        </div>
+        <ul class="list-group border rounded-3">
+          {% set attr_order = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"] %}
+          {% for attr_name in attr_order %}
+          {% if enemy.attributes[attr_name] is defined %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ attr_name }}</span>
+            <span class="d-flex align-items-center gap-1">
+              <span class="fw-bold">{{ enemy.attributes[attr_name].level }}</span>
+              {% if enemy.attributes[attr_name].rarity is defined %}
+              <span class="fw-bold rarity-{{ enemy.attributes[attr_name].rarity }}">( {{ enemy.attributes[attr_name].rarity }} )</span>
+              {% endif %}
+            </span>
+          </li>
+          {% endif %}
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center text-muted py-5">No enemy yet</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

@@ -4,9 +4,10 @@ from flask_wtf import CSRFProtect
 from flask_csp.csp import csp_header
 from routes import userManagement as dbUser
 from routes import character_generation as dbChar
+from routes import gauntlet_generation as dbGauntlet
 
 app = Flask(__name__, template_folder="../templates", static_folder="../static")
-app.secret_key = os.urandom(24)
+app.secret_key = "jJLZ5Z8xHgCBNnJg3lHGs1XFwQBkePyf"
 app.config["MAX_CONTENT_LENGTH"] = 80 * 1024 * 1024
 app.config["MAX_FORM_MEMORY_SIZE"] = 80 * 1024 * 1024
 csrf = CSRFProtect(app)
@@ -202,11 +203,16 @@ def gauntlet_endless():
 def gauntlet_waves():
     if not session.get("user_id"):
         return redirect("/index.html")
+    gauntlet = session.get("gauntlet")
     character_selected = bool(session.get("selected_character_id"))
+    character = None
     if character_selected:
-        return render_template("gauntlet_waves.html", characters=[], character_selected=True)
-    characters = dbChar.view_characters()
-    return render_template("gauntlet_waves.html", characters=characters, character_selected=False)
+        all_chars = dbChar.view_characters()
+        character = next((c for c in all_chars if c["id"] == session["selected_character_id"]), None)
+    if not character_selected:
+        characters = dbChar.view_characters()
+        return render_template("gauntlet_waves.html", characters=characters, character_selected=False, gauntlet=None, character=None)
+    return render_template("gauntlet_waves.html", characters=[], character_selected=True, gauntlet=gauntlet, character=character)
 
 @app.route("/api/select-character", methods=["POST"])
 def api_select_character():
@@ -218,6 +224,46 @@ def api_select_character():
     session["selected_character_id"] = int(character_id)
     return redirect("/gauntlet_waves")
 
+@app.route("/api/start-waves", methods=["POST"])
+def api_start_waves():
+    if not session.get("user_id"):
+        return redirect("/index.html")
+    character_id = session.get("selected_character_id")
+    total_waves = int(request.form.get("total_waves", 5))
+    if not character_id:
+        return redirect("/gauntlet_waves")
+    dbGauntlet.waves(character_id, total_waves)
+    return redirect("/gauntlet_waves")
+
+@app.route("/api/battle", methods=["POST"])
+def api_battle():
+    if not session.get("user_id"):
+        return redirect("/index.html")
+    if not session.get("gauntlet"):
+        return redirect("/gauntlet_waves")
+    # Store previous enemies data such as name and pfp so that when modal appears data is sync'd
+    fought_enemy = dict(session["gauntlet"]["current_enemy"])
+    result, breakdown = dbGauntlet.battle_outcome()
+    
+    char_id = session["gauntlet"]["character_id"]
+    all_chars = dbChar.view_characters()
+    char = next((c for c in all_chars if c["id"] == char_id), None)
+    character = {"name": char["name"], "pfp": char.get("profile_image")} if char else {}
+    return jsonify({
+        "result": result, 
+        "gauntlet": session["gauntlet"], 
+        "breakdown": breakdown, 
+        "character": character,
+        "fought_enemy": fought_enemy,
+    })
+
+@app.route("/api/reset-character", methods=["POST"])
+# Issue with JS not sending a CSRF token when retrieving data so page can't correctly redirect
+@csrf.exempt
+def api_reset_character():
+    session.pop("selected_character_id", None)
+    session.pop("gauntlet", None)
+    return "", 204
 
 @app.route("/logout")
 def logout():

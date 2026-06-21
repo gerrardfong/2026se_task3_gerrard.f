@@ -30,14 +30,13 @@ def waves(character_id: int, total_waves: int):
         "kills": 0,
         "total_xp": 0,
         "current_wave": 1,
-        "current_enemy": generate_enemy(),
+        "current_enemy": generate_enemy(1),
         "total_waves": total_waves
     }
-    
 
-# Creates enemy for waves and endless
-def generate_enemy():
-    current_wave = session["gauntlet"]["current_wave"]
+def generate_enemy(current_wave=None):
+    if current_wave is None:
+        current_wave = session["gauntlet"]["current_wave"]
     if current_wave % 5 == 0:
         return dbChar.create_boss()
     return dbChar.create_enemy()
@@ -78,20 +77,26 @@ def attribute_combat():
     enemy_attributes = session["gauntlet"]["current_enemy"]["attributes"]
     character_points = 0
     enemy_points = 0
+    breakdown = {}
 
     for attr in ATTRIBUTES:
         character_level = ranks[character_attributes[attr]]
         enemy_level = ranks[enemy_attributes[attr]["level"]]
         if character_level > enemy_level:
+            breakdown[attr] = "character"
             character_points += 1
-        if character_level < enemy_level:
+        elif character_level < enemy_level:
+            breakdown[attr] = "enemy"
             enemy_points += 1
+        else:
+            breakdown[attr] = "draw"
+        
+    return character_points, enemy_points, breakdown
     
-    return character_points, enemy_points
 
 
 def battle_outcome() -> str:
-    character_points, enemy_points = attribute_combat()
+    character_points, enemy_points, breakdown = attribute_combat()
 
     if character_points > enemy_points:
         add_xp()
@@ -103,7 +108,7 @@ def battle_outcome() -> str:
             if awakened:
                 session["gauntlet"]["current_enemy"] = awakened
                 session.modified = True
-                return "boss_awakened"         
+                return "boss_awakened", breakdown      
             if current_enemy["unlocks_species_id"]:
                 unlock_species(current_enemy["unlocks_species_id"])
 
@@ -112,20 +117,20 @@ def battle_outcome() -> str:
             if session['gauntlet']['current_wave'] > session['gauntlet']['total_waves']:
                 session.modified = True
                 save_xp()
-                return 'win'
+                return 'win', breakdown
         
         session['gauntlet']['current_enemy'] = generate_enemy()
         session.modified = True
-        return 'character_win'
+        return 'character_win', breakdown
 
     elif enemy_points > character_points:
         save_xp()
-        return 'game_over'
+        return 'game_over', breakdown
 
     else:
         session['gauntlet']['current_enemy'] = generate_enemy()
         session.modified = True
-        return 'draw'
+        return 'draw', breakdown
 
 def unlock_species(unlocks_species_id: int):
     conn = sql.connect(db_path)

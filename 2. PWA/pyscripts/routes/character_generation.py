@@ -15,6 +15,7 @@ RARITY_WEIGHTS = {
     "Ultra": 0.5,
 }
 
+
 ATTRIBUTES = ["Strength", "Durability", "Stamina", "Speed", "IQ", "BIQ"]
 
 

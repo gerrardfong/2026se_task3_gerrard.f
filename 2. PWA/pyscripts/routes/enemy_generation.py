@@ -29,7 +29,9 @@ RANDOM_NAMES = {
 
 # path for copy and paste: /static/images/enemies/
 RANDOM_PFP = [
-    "/static/images/enemies/enemy1.png"
+    "/static/images/enemies/enemy1.png",
+    "/static/images/enemies/enemy2.png",
+    "/static/images/enemies/enemy3.png"
 ]
 
 ENEMY_TIER_WEIGHTS = {
@@ -114,6 +116,9 @@ def roll_species() -> tuple:
         (rarity["rarity"],),
     )
     species = cur.fetchone()
+    if species is None:
+        cur.execute("SELECT id FROM species WHERE locked = 0 ORDER BY RANDOM() LIMIT 1")
+        species = cur.fetchone()
     conn.close()
     return species[0]
 
